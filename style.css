@@ -349,7 +349,8 @@ body::before {
     opacity: 0.05;
     z-index: 1;
     pointer-events: none;
-    animation: rotate 180s linear infinite;
+    animation: rotate 240s linear infinite;
+    will-change: transform;
     filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
 }
 
@@ -365,25 +366,29 @@ body::before {
 .side-chip.left-chip-1 {
     left: 8%;
     top: 18%;
-    animation: float 6s infinite ease-in-out;
+    animation: float 8s infinite ease-in-out;
+    will-change: transform;
 }
 
 .side-chip.left-chip-2 {
     left: 12%;
     bottom: 18%;
-    animation: float 5s infinite ease-in-out reverse;
+    animation: float 7s infinite ease-in-out reverse;
+    will-change: transform;
 }
 
 .side-chip.right-chip-1 {
     right: 8%;
     top: 22%;
-    animation: float 7s infinite ease-in-out;
+    animation: float 9s infinite ease-in-out;
+    will-change: transform;
 }
 
 .side-chip.right-chip-2 {
     right: 10%;
     bottom: 15%;
-    animation: float 5.5s infinite ease-in-out reverse;
+    animation: float 7.5s infinite ease-in-out reverse;
+    will-change: transform;
 }
 
 .landing-center-content {
@@ -514,14 +519,16 @@ body::before {
     width: 140px;
     top: 15%;
     left: 8%;
-    animation: float 6s infinite ease-in-out;
+    animation: float 8s infinite ease-in-out;
+    will-change: transform;
 }
 
 .chip-2 {
     width: 100px;
     bottom: 15%;
     right: 10%;
-    animation: float 5s infinite ease-in-out reverse;
+    animation: float 7s infinite ease-in-out reverse;
+    will-change: transform;
 }
 
 .roulette-hero {
@@ -529,7 +536,8 @@ body::before {
     top: 10%;
     right: -50px;
     opacity: 0.3;
-    animation: rotate 60s linear infinite;
+    animation: rotate 90s linear infinite;
+    will-change: transform;
 }
 
 @keyframes float {
@@ -606,7 +614,8 @@ body::before {
     pointer-events: none;
     user-select: none;
     z-index: 0;
-    animation: suitWatermark 8s ease-in-out infinite;
+    animation: suitWatermark 12s ease-in-out infinite;
+    will-change: transform, opacity;
 }
 
 .suit-wm-1 {
@@ -759,8 +768,8 @@ body::before {
     transform: skewX(-20deg);
     pointer-events: none;
     z-index: 0;
-    animation: spotlightMove 8s ease-in-out infinite;
-    animation-delay: 2s;
+    animation: spotlightMove 16s ease-in-out infinite;
+    animation-delay: 4s;
 }
 
 
@@ -3107,5 +3116,63 @@ footer {
     .rsvp-buttons-container button {
         width: 100%;
         padding: 1.2rem 2rem;
+    }
+}
+
+/* =============================================
+   PERFORMANCE — MOBILE & REDUCED MOTION
+   ============================================= */
+
+/* On mobile devices, kill expensive GPU animations to prevent lag */
+@media (max-width: 768px) {
+    /* Stop floating animations on mobile chips (huge FPS gain) */
+    .chip-1, .chip-2,
+    .side-chip.left-chip-1,
+    .side-chip.left-chip-2,
+    .side-chip.right-chip-1,
+    .side-chip.right-chip-2 {
+        animation: none !important;
+    }
+
+    /* Simplify backdrop blurs on mobile — very expensive on low-end GPUs */
+    .glass-card-v3,
+    .dress-card,
+    .timer-box,
+    .rsvp-card-v3 {
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+    }
+
+    /* Hide decorative suit watermarks on mobile for cleaner experience */
+    .suit-watermark {
+        display: none !important;
+    }
+
+    /* Slow down the spotlight sweep — it paints a large area every frame */
+    .section-spotlight {
+        animation-duration: 24s !important;
+    }
+
+    /* Reduce borderGlow repaint rate */
+    .hero-info-item {
+        animation: none !important;
+        box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+    }
+
+    /* Stop roulette rotation to free GPU */
+    .roulette-hero {
+        animation: none !important;
+        opacity: 0.15 !important;
+    }
+}
+
+/* Respect user accessibility setting (reduce motion in OS) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.1s !important;
     }
 }

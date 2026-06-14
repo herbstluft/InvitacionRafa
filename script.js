@@ -800,8 +800,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Run access control check immediately
     checkInvitationAccess();
 
-    // --- Initialize Vanilla Tilt ---
-    if (typeof VanillaTilt !== 'undefined') {
+    // --- Initialize Vanilla Tilt (desktop only — no value on touch devices) ---
+    const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
+    if (typeof VanillaTilt !== 'undefined' && !isTouchDevice()) {
         VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
             max: 10,
             speed: 600,
@@ -822,6 +823,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const registerSpotlights = () => {
+        // Spotlight tracker only useful on desktop (needs mouse)
+        if (isTouchDevice()) return;
         const items = document.querySelectorAll('.glass-card-v3, .rsvp-card-v3, .timer-box, .t-item');
         items.forEach(item => {
             item.addEventListener('mousemove', updateSpotlight);
@@ -861,9 +864,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Three.js 3D Background ---
     let mouseX = 0, mouseY = 0;
+    let mouseMoveScheduled = false;
     window.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX - window.innerWidth / 2) / 200;
-        mouseY = (e.clientY - window.innerHeight / 2) / 200;
+        // Throttle mousemove to ~30fps max to save CPU
+        if (!mouseMoveScheduled) {
+            mouseMoveScheduled = true;
+            requestAnimationFrame(() => {
+                mouseX = (e.clientX - window.innerWidth / 2) / 200;
+                mouseY = (e.clientY - window.innerHeight / 2) / 200;
+                mouseMoveScheduled = false;
+            });
+        }
     });
 
     const initThree = () => {
@@ -913,7 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const suitParticleSystems = [];
         [0, 1, 2, 3].forEach(suitIdx => {
             const geo = new THREE.BufferGeometry();
-            const cnt = 80; // fewer, bigger symbols
+            const cnt = 30; // reduced for performance
             const pos = new Float32Array(cnt * 3);
             const vels = new Float32Array(cnt);
             const sw = new Float32Array(cnt);
@@ -960,8 +971,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        let threeAnimPaused = false;
+        let threeAnimId = null;
+
         const animate = () => {
-            requestAnimationFrame(animate);
+            if (threeAnimPaused) return;
+            threeAnimId = requestAnimationFrame(animate);
 
             const t = Date.now() * 0.001;
 
@@ -994,6 +1009,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         animate();
 
+        // Pause WebGL animation when tab is hidden to save CPU/GPU
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                threeAnimPaused = true;
+                if (threeAnimId) cancelAnimationFrame(threeAnimId);
+            } else {
+                threeAnimPaused = false;
+                animate();
+            }
+        });
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -1109,42 +1134,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Countdown ---
     function initCountdown() {
         const target = new Date("August 15, 2026 00:00:00").getTime();
+        // Cache DOM elements once
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        const dBar = document.getElementById('days-bar');
+        const hBar = document.getElementById('hours-bar');
+        const mBar = document.getElementById('minutes-bar');
+        const sBar = document.getElementById('seconds-bar');
+        const maxOffset = 282.74;
+        const maxDaysVal = 90;
+
         const updateTimer = () => {
-            const now = new Date().getTime();
+            const now = Date.now();
             const diff = target - now;
+            if (diff <= 0) return;
 
-            const d = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
-            const h = Math.max(0, Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-            const m = Math.max(0, Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
-            const s = Math.max(0, Math.floor((diff % (1000 * 60)) / 1000));
-
-            const daysEl = document.getElementById('days');
-            const hoursEl = document.getElementById('hours');
-            const minutesEl = document.getElementById('minutes');
-            const secondsEl = document.getElementById('seconds');
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
 
             if (daysEl) daysEl.innerText = d.toString().padStart(2, '0');
             if (hoursEl) hoursEl.innerText = h.toString().padStart(2, '0');
             if (minutesEl) minutesEl.innerText = m.toString().padStart(2, '0');
             if (secondsEl) secondsEl.innerText = s.toString().padStart(2, '0');
 
-            // Bar circles stroke-dashoffset (282.74 is 2 * PI * 45)
-            const maxOffset = 282.74;
-            const maxDaysVal = 90;
-
-            const dBar = document.getElementById('days-bar');
-            const hBar = document.getElementById('hours-bar');
-            const mBar = document.getElementById('minutes-bar');
-            const sBar = document.getElementById('seconds-bar');
-
             if (dBar) dBar.style.strokeDashoffset = (maxOffset - Math.min(1, d / maxDaysVal) * maxOffset);
             if (hBar) hBar.style.strokeDashoffset = (maxOffset - (h / 24) * maxOffset);
             if (mBar) mBar.style.strokeDashoffset = (maxOffset - (m / 60) * maxOffset);
             if (sBar) sBar.style.strokeDashoffset = (maxOffset - (s / 60) * maxOffset);
-
-            if (diff > 0) requestAnimationFrame(updateTimer);
         };
+
+        // Use setInterval at 1fps — perfectly sufficient for a countdown timer
         updateTimer();
+        setInterval(updateTimer, 1000);
     }
 
     // --- GSAP ScrollTrigger reveals ---
