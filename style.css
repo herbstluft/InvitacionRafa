@@ -162,16 +162,16 @@ body::before {
     right: 2rem;
     width: 60px;
     height: 60px;
-    background: var(--glass);
-    backdrop-filter: blur(10px);
     border-radius: 50%;
+    background: #0d0d0d;
     border: 1px solid var(--gold);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
     cursor: pointer;
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    z-index: 99;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
 }
 
 .floating-music img {
@@ -330,11 +330,9 @@ body::before {
     position: absolute;
     width: min(80vw, 750px);
     height: auto;
-    opacity: 0.05;
+    opacity: 0.04;
     z-index: 1;
     pointer-events: none;
-    animation: rotate 240s linear infinite;
-    will-change: transform;
     filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
 }
 
@@ -350,29 +348,21 @@ body::before {
 .side-chip.left-chip-1 {
     left: 8%;
     top: 18%;
-    animation: float 8s infinite ease-in-out;
-    will-change: transform;
 }
 
 .side-chip.left-chip-2 {
     left: 12%;
     bottom: 18%;
-    animation: float 7s infinite ease-in-out reverse;
-    will-change: transform;
 }
 
 .side-chip.right-chip-1 {
     right: 8%;
     top: 22%;
-    animation: float 9s infinite ease-in-out;
-    will-change: transform;
 }
 
 .side-chip.right-chip-2 {
     right: 10%;
     bottom: 15%;
-    animation: float 7.5s infinite ease-in-out reverse;
-    will-change: transform;
 }
 
 .landing-center-content {
@@ -503,25 +493,19 @@ body::before {
     width: 140px;
     top: 15%;
     left: 8%;
-    animation: float 8s infinite ease-in-out;
-    will-change: transform;
 }
 
 .chip-2 {
     width: 100px;
     bottom: 15%;
     right: 10%;
-    animation: float 7s infinite ease-in-out reverse;
-    will-change: transform;
 }
 
 .roulette-hero {
     width: 400px;
     top: 10%;
     right: -50px;
-    opacity: 0.3;
-    animation: rotate 90s linear infinite;
-    will-change: transform;
+    opacity: 0.15;
 }
 
 @keyframes float {
@@ -579,8 +563,7 @@ body::before {
     padding: 0.6rem 1.4rem;
     border: 1.5px solid var(--gold);
     border-radius: 30px;
-    background: rgba(10, 10, 10, 0.85);
-    backdrop-filter: blur(10px);
+    background: #0d0d0d;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.15);
 }
 
@@ -676,9 +659,7 @@ body::before {
 }
 
 .dress-card {
-    background: rgba(10, 10, 10, 0.7);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: #0d0d0d;
     border: 1px solid var(--glass-border);
     border-radius: 24px;
     padding: 3rem 2rem;
@@ -757,9 +738,7 @@ body::before {
 
 .glass-card-v3 {
     position: relative;
-    background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(212, 175, 55, 0.06), rgba(10, 10, 10, 0.75) 50%, rgba(5, 5, 5, 0.9) 100%);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: #0d0d0d;
     border: 1px solid var(--glass-border);
     padding: 5rem;
     border-radius: var(--radius);
@@ -957,9 +936,7 @@ body::before {
 }
 
 .timer-box {
-    background: rgba(10, 10, 10, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: #0d0d0d;
     border: 1px solid var(--glass-border);
     padding: 2.5rem 2rem;
     border-radius: 24px;
@@ -1424,9 +1401,7 @@ body::before {
     max-width: 420px;
     margin: 0 2.5rem;
     z-index: 2;
-    background: rgba(10, 10, 10, 0.6);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    background: #0d0d0d;
     border: 1px solid var(--glass-border);
     border-radius: 20px;
     padding: 2rem;
@@ -1709,9 +1684,7 @@ body::before {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(5, 5, 5, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(5, 5, 5, 0.98);
     z-index: 4000;
     display: flex;
     justify-content: center;
@@ -2091,9 +2064,7 @@ footer {
 
 /* --- Cards --- */
 .admin-card {
-    background: radial-gradient(ellipse at top left, rgba(212, 175, 55, 0.06) 0%, rgba(8, 8, 8, 0.92) 60%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: #0d0d0d;
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 1.5rem;
@@ -2575,8 +2546,7 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.88);
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.94);
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -2623,14 +2593,13 @@ footer {
 }
 
 .admin-toast {
-    background: rgba(10, 10, 10, 0.95);
+    background: #0f0f0f;
     border-left: 4px solid var(--gold);
     border-radius: 10px;
     padding: 1rem 1.5rem;
     font-size: 0.88rem;
     color: #fff;
     letter-spacing: 0.5px;
-    backdrop-filter: blur(10px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     animation: toastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
     pointer-events: auto;
@@ -3116,14 +3085,7 @@ footer {
         animation: none !important;
     }
 
-    /* Simplify backdrop blurs on mobile — very expensive on low-end GPUs */
-    .glass-card-v3,
-    .dress-card,
-    .timer-box,
-    .rsvp-card-v3 {
-        backdrop-filter: blur(6px) !important;
-        -webkit-backdrop-filter: blur(6px) !important;
-    }
+
 
     /* Hide decorative suit watermarks on mobile for cleaner experience */
     .suit-watermark {

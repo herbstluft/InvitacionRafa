@@ -849,17 +849,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- GSAP Landing Intro Animation ---
     if (typeof gsap !== 'undefined') {
         const introTl = gsap.timeline();
-        introTl.set(".landing-frame", { scale: 1.05, opacity: 0 })
-            .set(".landing-roulette-bg", { scale: 0.5, opacity: 0 })
+        introTl.set(".landing-frame", { scale: 1.02, opacity: 0 })
+            .set(".landing-roulette-bg", { scale: 0.8, opacity: 0 })
             .set(".corner-decor", { opacity: 0 })
-            .set(".side-chip", { scale: 0, opacity: 0 })
-            .set(".envelope-wrapper", { scale: 0.9, y: 50, opacity: 0 });
+            .set(".side-chip", { scale: 0.5, opacity: 0 })
+            .set(".envelope-wrapper", { scale: 0.96, y: 20, opacity: 0 });
 
-        introTl.to(".landing-frame", { duration: 1.2, scale: 1, opacity: 1, ease: "power4.out" })
-            .to(".landing-roulette-bg", { duration: 2, scale: 1, opacity: 0.04, ease: "power4.out" }, "-=0.8")
-            .to(".envelope-wrapper", { duration: 1.2, scale: 1, y: 0, opacity: 1, ease: "back.out(1.2)" }, "-=1.2")
-            .to(".side-chip", { duration: 1, scale: 1, opacity: 0.85, stagger: 0.1, ease: "back.out(1.5)" }, "-=0.8")
-            .to(".corner-decor", { duration: 0.8, opacity: 1, stagger: 0.08, ease: "power2.out" }, "-=0.4");
+        introTl.to(".landing-frame", { duration: 0.5, scale: 1, opacity: 1, ease: "power2.out" })
+            .to(".landing-roulette-bg", { duration: 0.6, scale: 1, opacity: 0.04, ease: "power2.out" }, "-=0.3")
+            .to(".envelope-wrapper", { duration: 0.6, scale: 1, y: 0, opacity: 1, ease: "back.out(1.0)" }, "-=0.4")
+            .to(".side-chip", { duration: 0.5, scale: 1, opacity: 0.85, stagger: 0.05, ease: "back.out(1.2)" }, "-=0.3")
+            .to(".corner-decor", { duration: 0.4, opacity: 1, stagger: 0.04, ease: "power2.out" }, "-=0.2");
     }
 
 
@@ -895,13 +895,13 @@ document.addEventListener('DOMContentLoaded', () => {
             mainContent.classList.remove('hidden');
 
             // Fast snappy fade out / zoom out transition
-            tl.to(".envelope-wrapper", { duration: 0.3, scale: 0.9, opacity: 0, ease: "power2.in" })
-                .to([".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], { duration: 0.3, opacity: 0, ease: "power2.in" }, "-=0.3")
-                .to(landingOverlay, { duration: 0.8, y: "-100%", ease: "expo.inOut" }, "-=0.1")
+            tl.to(".envelope-wrapper", { duration: 0.2, scale: 0.95, opacity: 0, ease: "power2.in" })
+                .to([".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], { duration: 0.2, opacity: 0, ease: "power2.in" }, "-=0.2")
+                .to(landingOverlay, { duration: 0.45, y: "-100%", ease: "expo.inOut" }, "-=0.1")
                 .set(landingOverlay, { display: "none" })
-                .from(".hero-v3 .hero-text > *", { duration: 1.0, y: 50, opacity: 0, stagger: 0.1, ease: "power3.out" }, "-=0.4")
-                .from(".hero-frame", { duration: 1.2, scale: 0.95, opacity: 0, ease: "power3.out" }, "-=0.8")
-                .from(".floating-asset", { duration: 1.5, scale: 0, opacity: 0, stagger: 0.15, ease: "back.out(1.2)" }, "-=0.8");
+                .from(".hero-v3 .hero-text > *", { duration: 0.4, y: 15, opacity: 0, stagger: 0.05, ease: "power2.out" }, "-=0.25")
+                .from(".hero-frame", { duration: 0.5, scale: 0.98, opacity: 0, ease: "power2.out" }, "-=0.35")
+                .from(".floating-asset", { duration: 0.6, scale: 0.5, opacity: 0, stagger: 0.05, ease: "back.out(1.2)" }, "-=0.45");
         } else {
             mainContent.classList.remove('hidden');
             landingOverlay.style.display = "none";
@@ -1003,24 +1003,24 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(updateTimer, 1000);
     }
 
-    // --- GSAP ScrollTrigger reveals ---
+    // --- GSAP ScrollTrigger reveals (Optimized for instant, supersonic reveal) ---
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
 
-        gsap.set(".reveal", { y: 50, opacity: 0 });
+        gsap.set(".reveal", { y: 15, opacity: 0 });
 
         const reveals = gsap.utils.toArray('.reveal');
         reveals.forEach(el => {
             gsap.to(el, {
                 scrollTrigger: {
                     trigger: el,
-                    start: "top 88%",
+                    start: "top 95%",
                     toggleActions: "play none none reverse"
                 },
                 y: 0,
                 opacity: 1,
-                duration: 1,
-                ease: "power3.out"
+                duration: 0.45,
+                ease: "power2.out"
             });
         });
     }
