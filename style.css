@@ -244,8 +244,7 @@ body::before {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, rgba(5, 5, 5, 0.9) 0%, rgba(15, 15, 15, 0.98) 100%), url('assets/bg.png') no-repeat center center;
-    background-size: cover;
+    background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #050505 85%, #000000 100%);
     z-index: 3000;
     display: flex;
     justify-content: center;
@@ -259,8 +258,7 @@ body::before {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, rgba(5, 5, 5, 0.9) 0%, rgba(15, 15, 15, 0.98) 100%), url('assets/bg.png') no-repeat center center;
-    background-size: cover;
+    background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #050505 85%, #000000 100%);
     z-index: 3000;
     display: flex;
     flex-direction: column;
@@ -1116,7 +1114,6 @@ body::before {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    perspective: 1500px;
     z-index: 15;
     width: 100%;
 }
@@ -1145,7 +1142,6 @@ body::before {
     height: 380px;
     position: relative;
     cursor: pointer;
-    perspective: 1500px;
 }
 
 .envelope {
@@ -1155,8 +1151,6 @@ body::before {
     background: #080808;
     border-radius: 16px;
     box-shadow: 0 35px 70px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(212, 175, 55, 0.15);
-    transform-style: preserve-3d;
-    transition: transform 0.5s ease;
 }
 
 .envelope-flap {
@@ -1168,9 +1162,6 @@ body::before {
     background: linear-gradient(to bottom, #151515, #080808);
     clip-path: polygon(0 0, 100% 0, 50% 100%);
     z-index: 4;
-    transform-origin: top;
-    transform: rotateX(0deg) translateZ(12px);
-    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1) 0.2s, z-index 0.2s ease 0.4s;
     border-bottom: 1px solid rgba(212, 175, 55, 0.2);
 }
 
@@ -1186,27 +1177,25 @@ body::before {
     border-radius: 16px;
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
     border-top: 1px solid rgba(212, 175, 55, 0.15);
-    transform: translateZ(15px);
 }
 
 .envelope-seal-container {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -40%) translateZ(20px) scale(1);
+    transform: translate(-50%, -40%) scale(1);
     z-index: 5;
     cursor: pointer;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
 }
 
 .envelope-seal-container:hover {
-    transform: translate(-50%, -40%) translateZ(20px) scale(1.15);
+    transform: translate(-50%, -40%) scale(1.15);
 }
 
 .envelope-seal {
     width: 90px;
     height: auto;
-    filter: drop-shadow(0 5px 15px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 25px rgba(212, 175, 55, 0.2));
 }
 
 .envelope-paper {
@@ -1226,7 +1215,6 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translateZ(5px);
 }
 
 .paper-content {

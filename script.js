@@ -802,15 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialize Vanilla Tilt (desktop only — no value on touch devices) ---
     const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
-    if (typeof VanillaTilt !== 'undefined' && !isTouchDevice()) {
-        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
-            max: 10,
-            speed: 600,
-            glare: true,
-            "max-glare": 0.25,
-            perspective: 1200
-        });
-    }
+
 
     // --- Interactive Mouse Spotlight Tracker ---
     const updateSpotlight = (e) => {
@@ -897,7 +889,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Fast snappy fade out / zoom out transition
             tl.to(".envelope-wrapper", { duration: 0.2, scale: 0.95, opacity: 0, ease: "power2.in" })
                 .to([".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], { duration: 0.2, opacity: 0, ease: "power2.in" }, "-=0.2")
-                .to(landingOverlay, { duration: 0.45, y: "-100%", ease: "expo.inOut" }, "-=0.1")
+                .to(landingOverlay, { duration: 0.35, opacity: 0, ease: "power2.out" }, "-=0.15")
                 .set(landingOverlay, { display: "none" })
                 .from(".hero-v3 .hero-text > *", { duration: 0.4, y: 15, opacity: 0, stagger: 0.05, ease: "power2.out" }, "-=0.25")
                 .from(".hero-frame", { duration: 0.5, scale: 0.98, opacity: 0, ease: "power2.out" }, "-=0.35")
@@ -909,16 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         initCountdown();
 
-        // Reinitialize tilt after main reveals for new elements (desktop only)
-        if (typeof VanillaTilt !== 'undefined' && !isTouchDevice()) {
-            VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
-                max: 10,
-                speed: 600,
-                glare: true,
-                "max-glare": 0.25,
-                perspective: 1200
-            });
-        }
+
     };
 
     if (envelope) {
