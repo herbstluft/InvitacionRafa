@@ -38,7 +38,10 @@ body::before {
     width: 100vw;
     height: 100vh;
     z-index: -3;
-    background: radial-gradient(ellipse at 50% 0%, #0c0800 0%, #050505 60%, #000 100%);
+    background: 
+        radial-gradient(circle at 10% 20%, rgba(212, 175, 55, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(176, 21, 37, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, #0a0a0a 0%, #050505 85%, #000000 100%);
     pointer-events: none;
 }
 
@@ -109,17 +112,6 @@ body::before {
     }
 }
 
-@keyframes borderGlow {
-
-    0%,
-    100% {
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.2), 0 0 40px rgba(212, 175, 55, 0.1);
-    }
-
-    50% {
-        box-shadow: 0 0 40px rgba(212, 175, 55, 0.5), 0 0 80px rgba(212, 175, 55, 0.25), 0 0 120px rgba(212, 175, 55, 0.1);
-    }
-}
 
 @keyframes suitWatermark {
     0% {
@@ -138,15 +130,7 @@ body::before {
     }
 }
 
-/* 3D Canvas Background */
-#bg-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -2;
-}
+
 
 .sparkles-overlay {
     position: fixed;
@@ -597,8 +581,7 @@ body::before {
     border-radius: 30px;
     background: rgba(10, 10, 10, 0.85);
     backdrop-filter: blur(10px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    animation: borderGlow 3s ease-in-out infinite;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.15);
 }
 
 .hero-info-sep {
@@ -651,9 +634,8 @@ body::before {
     background: var(--glass);
     border-radius: var(--radius);
     border: 1px solid var(--gold);
-    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(212, 175, 55, 0.1);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7), 0 0 45px rgba(212, 175, 55, 0.15);
     overflow: hidden;
-    animation: borderGlow 4s ease-in-out infinite;
 }
 
 .main-portrait {
