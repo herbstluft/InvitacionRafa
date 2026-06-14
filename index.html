@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Casino Royale - Rafa's 15th Birthday Invitation</title>
+    <meta name="description"
+        content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa.">
+    
+    <!-- Favicon / Chrome tab icon -->
+    <link rel="icon" type="image/png" href="assets/chip.png">
+
+    <!-- Open Graph / Link Preview (WhatsApp, Facebook) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="♠️ Casino Royale ♣️ - Invitación VIP">
+    <meta property="og:description" content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa. 🎰">
+    <meta property="og:image" content="https://cumpleanosrafa.netlify.app/assets/logo.png">
+    <meta property="og:url" content="https://cumpleanosrafa.netlify.app/">
+
+    <!-- Twitter Link Preview -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="♠️ Casino Royale ♣️ - Invitación VIP">
+    <meta name="twitter:description" content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa. 🎰">
+    <meta name="twitter:image" content="https://cumpleanosrafa.netlify.app/assets/logo.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Montserrat:wght@300;400;700;900&family=Playball&display=swap"
+        rel="stylesheet">
+
+    <!-- Local Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- WebGL Particle Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Sparkles and Vignette Effects -->
+    <div class="sparkles-overlay"></div>
+    <div class="vignette"></div>
+    <!-- Ambient casino spotlight sweep -->
+    <div class="casino-spotlight" aria-hidden="true"></div>
+
+    <!-- Floating Music Toggle -->
+    <div id="music-control" class="floating-music hidden">
+        <img id="music-icon" src="assets/music.png" alt="Controles de Música">
+        <audio id="bg-music" src="assets/music.mp3" loop preload="auto"></audio>
+    </div>
+
+    <!-- Sealed Envelope Overlay Landing Page -->
+    <div id="landing-overlay" class="overlay">
+        <!-- Outer gold border frame -->
+        <div class="landing-frame"></div>
+
+        <!-- Rotating Roulette in background -->
+        <img src="assets/roulette.png" alt="Ruleta Casino Background" class="landing-roulette-bg">
+
+        <!-- Corner text decorations -->
+        <div class="corner-decor top-left cinzel-font">EXCLUSIVO</div>
+        <div class="corner-decor top-right cinzel-font">Nº 777</div>
+        <div class="corner-decor bottom-left cinzel-font">DRESS CODE: GALA</div>
+        <div class="corner-decor bottom-right cinzel-font">CÓDIGO: VIP</div>
+
+        <!-- Flanking Floating Chips -->
+        <img src="assets/chip.png" alt="Gold Chip" class="side-chip left-chip-1">
+        <img src="assets/chip.png" alt="Gold Chip" class="side-chip left-chip-2">
+        <img src="assets/chip.png" alt="Gold Chip" class="side-chip right-chip-1">
+        <img src="assets/chip.png" alt="Gold Chip" class="side-chip right-chip-2">
+
+        <!-- Interactive Envelope Wrapper -->
+        <div class="envelope-wrapper">
+            <div class="envelope-instruction cinzel-font">HAS RECIBIDO UNA INVITACIÓN EXCLUSIVA<br><span>(Toca el sello
+                    de cera para abrir)</span></div>
+
+            <div class="envelope-container" data-tilt>
+                <div class="envelope">
+                    <!-- Envelope flap -->
+                    <div class="envelope-flap"></div>
+                    <!-- Wax seal button -->
+                    <div class="envelope-seal-container">
+                        <img src="assets/seal.png" alt="Sello de Cera" class="envelope-seal">
+                    </div>
+                    <!-- Invitation card paper inside -->
+                    <div class="envelope-paper">
+                        <!-- Left & Right Gold side ornaments -->
+                        <svg class="side-ornament left" viewBox="0 0 30 200" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gold-grad-orn" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#f9e272" />
+                                    <stop offset="50%" stop-color="#d4af37" />
+                                    <stop offset="100%" stop-color="#996515" />
+                                </linearGradient>
+                            </defs>
+                            <path
+                                d="M15,5 C15,5 28,15 18,30 C8,45 18,60 18,60 M15,5 L15,195 M18,60 C18,60 5,75 15,90 C25,105 15,120 15,120 M15,120 C15,120 28,135 18,150 C8,165 18,180 18,180"
+                                stroke="url(#gold-grad-orn)" stroke-width="1.2" fill="none" />
+                            <circle cx="15" cy="3" r="1.5" fill="url(#gold-grad-orn)" />
+                            <circle cx="15" cy="197" r="1.5" fill="url(#gold-grad-orn)" />
+                        </svg>
+                        <svg class="side-ornament right" viewBox="0 0 30 200" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M15,5 C15,5 28,15 18,30 C8,45 18,60 18,60 M15,5 L15,195 M18,60 C18,60 5,75 15,90 C25,105 15,120 15,120 M15,120 C15,120 28,135 18,150 C8,165 18,180 18,180"
+                                stroke="url(#gold-grad-orn)" stroke-width="1.2" fill="none" />
+                            <circle cx="15" cy="3" r="1.5" fill="url(#gold-grad-orn)" />
+                            <circle cx="15" cy="197" r="1.5" fill="url(#gold-grad-orn)" />
+                        </svg>
+
+                        <div class="paper-content">
+                            <!-- Cards Fan at Top -->
+                            <div class="cards-fan-container">
+                                <div class="fan-card card-1">
+                                    <div class="card-corner-top">
+                                        <span class="card-val-top">A</span>
+                                        <span class="card-suit-top">♦</span>
+                                    </div>
+                                    <span class="card-suit-center">♦</span>
+                                    <div class="card-corner-bottom">
+                                        <span class="card-val-bottom">A</span>
+                                        <span class="card-suit-bottom">♦</span>
+                                    </div>
+                                </div>
+                                <div class="fan-card card-2">
+                                    <div class="card-corner-top">
+                                        <span class="card-val-top">A</span>
+                                        <span class="card-suit-top">♣</span>
+                                    </div>
+                                    <span class="card-suit-center">♣</span>
+                                    <div class="card-corner-bottom">
+                                        <span class="card-val-bottom">A</span>
+                                        <span class="card-suit-bottom">♣</span>
+                                    </div>
+                                </div>
+                                <div class="fan-card card-3">
+                                    <div class="card-corner-top">
+                                        <span class="card-val-top">A</span>
+                                        <span class="card-suit-top">♥</span>
+                                    </div>
+                                    <span class="card-suit-center">♥</span>
+                                    <div class="card-corner-bottom">
+                                        <span class="card-val-bottom">A</span>
+                                        <span class="card-suit-bottom">♥</span>
+                                    </div>
+                                </div>
+                                <div class="fan-card card-4">
+                                    <div class="card-corner-top">
+                                        <span class="card-val-top">A</span>
+                                        <span class="card-suit-top">♠</span>
+                                    </div>
+                                    <span class="card-suit-center">♠</span>
+                                    <div class="card-corner-bottom">
+                                        <span class="card-val-bottom">A</span>
+                                        <span class="card-suit-bottom">♠</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 3D Gold Dice -->
+                            <div class="dice-container">
+                                <svg class="dice-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <linearGradient id="gold-light" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" stop-color="#fff5bd" />
+                                            <stop offset="100%" stop-color="#e2bf46" />
+                                        </linearGradient>
+                                        <linearGradient id="gold-med" x1="0%" y1="0%" x2="100%" y2="100%">
+                                            <stop offset="0%" stop-color="#e2bf46" />
+                                            <stop offset="100%" stop-color="#b88f1d" />
+                                        </linearGradient>
+                                        <linearGradient id="gold-dark" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" stop-color="#b88f1d" />
+                                            <stop offset="100%" stop-color="#6e5005" />
+                                        </linearGradient>
+                                        <filter id="dice-glow" x="-20%" y="-20%" width="140%" height="140%">
+                                            <feGaussianBlur in="SourceAlpha" stdDeviation="4" />
+                                            <feOffset dx="0" dy="0" />
+                                            <feComponentTransfer>
+                                                <feFuncA type="linear" slope="0.6" />
+                                            </feComponentTransfer>
+                                            <feMerge>
+                                                <feMergeNode />
+                                                <feMergeNode in="SourceGraphic" />
+                                            </feMerge>
+                                        </filter>
+                                    </defs>
+
+                                    <!-- Dice 1 (Left) -->
+                                    <g transform="translate(75, 60) rotate(-15)" filter="url(#dice-glow)">
+                                        <path d="M 0,-20 L 18,-10 L 0,0 L -18,-10 Z" fill="url(#gold-light)" />
+                                        <path d="M -18,-10 L 0,0 L 0,20 L -18,10 Z" fill="url(#gold-med)" />
+                                        <path d="M 0,0 L 18,-10 L 18,10 L 0,20 Z" fill="url(#gold-dark)" />
+
+                                        <circle cx="0" cy="-10" r="1.5" fill="#151515" />
+                                        <circle cx="-8" cy="-14" r="1.5" fill="#151515" />
+                                        <circle cx="8" cy="-6" r="1.5" fill="#151515" />
+                                        <circle cx="-8" cy="-6" r="1.5" fill="#151515" />
+                                        <circle cx="8" cy="-14" r="1.5" fill="#151515" />
+
+                                        <circle cx="-12" cy="2" r="1.5" fill="#151515" />
+                                        <circle cx="-9" cy="5" r="1.5" fill="#151515" />
+                                        <circle cx="-6" cy="8" r="1.5" fill="#151515" />
+
+                                        <circle cx="5" cy="3" r="1.5" fill="#151515" />
+                                        <circle cx="13" cy="7" r="1.5" fill="#151515" />
+                                    </g>
+
+                                    <!-- Dice 2 (Right) -->
+                                    <g transform="translate(125, 55) rotate(20)" filter="url(#dice-glow)">
+                                        <path d="M 0,-20 L 18,-10 L 0,0 L -18,-10 Z" fill="url(#gold-light)" />
+                                        <path d="M -18,-10 L 0,0 L 0,20 L -18,10 Z" fill="url(#gold-med)" />
+                                        <path d="M 0,0 L 18,-10 L 18,10 L 0,20 Z" fill="url(#gold-dark)" />
+
+                                        <circle cx="-8" cy="-14" r="1.5" fill="#151515" />
+                                        <circle cx="8" cy="-6" r="1.5" fill="#151515" />
+                                        <circle cx="-8" cy="-6" r="1.5" fill="#151515" />
+                                        <circle cx="8" cy="-14" r="1.5" fill="#151515" />
+
+                                        <circle cx="-12" cy="3" r="1.5" fill="#151515" />
+                                        <circle cx="-12" cy="8" r="1.5" fill="#151515" />
+                                        <circle cx="-12" cy="13" r="1.5" fill="#151515" />
+                                        <circle cx="-6" cy="7" r="1.5" fill="#151515" />
+                                        <circle cx="-6" cy="12" r="1.5" fill="#151515" />
+                                        <circle cx="-6" cy="17" r="1.5" fill="#151515" />
+
+                                        <circle cx="9" cy="5" r="2.5" fill="#151515" />
+                                    </g>
+                                </svg>
+                            </div>
+
+                            <!-- Quote -->
+                            <p class="card-quote">"La vida es un juego, el destino da las cartas, tú decides qué hacer
+                                con ellas."</p>
+
+                            <!-- Rafa Name -->
+                            <h1 class="card-rafa-title">Rafa</h1>
+
+                            <!-- Simple spacing for mobile -->
+                            <div style="height: 10px;"></div>
+
+                            <!-- Bottom Cards fan peak -->
+                            <div class="bottom-cards-fan">
+                                <div class="bottom-fan-card card-1"></div>
+                                <div class="bottom-fan-card card-2"></div>
+                                <div class="bottom-fan-card card-3"></div>
+                                <div class="bottom-fan-card card-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Envelope pocket -->
+                    <div class="envelope-pocket"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Access Denied Screen -->
+    <div id="denied-overlay" class="overlay-scrollable hidden">
+        <div class="landing-frame"></div>
+        <!-- Rotating Roulette in background -->
+        <img src="assets/roulette.png" alt="Ruleta Casino Background" class="landing-roulette-bg">
+        <div class="landing-center-content">
+            <h2 class="cinzel-font welcome-sub"
+                style="color: var(--crimson-light); text-shadow: 0 0 10px rgba(176,21,37,0.5);">ACCESO RESTRINGIDO</h2>
+            <h1 class="rafa-title title-script"
+                style="font-size: 5.5rem; background: linear-gradient(to bottom, #ffb3b8 20%, #b01525 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8));">
+                Sin Acceso</h1>
+            <div class="suits-divider" style="color: var(--crimson-light); opacity: 0.6;">♠ ♥ ♣ ♦</div>
+            <p id="denied-message" class="cinzel-font"
+                style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 3rem; max-width: 600px; color: #eee; text-align: center; letter-spacing: 1px;">
+                Esta invitación es personal e intransferible. Por favor, solicita tu enlace de acceso VIP al anfitrión
+                para ingresar al Casino Royale.
+            </p>
+            <div class="glass-card-v3 felt-card"
+                style="padding: 2.5rem; border-color: rgba(176, 21, 37, 0.4) !important; background: radial-gradient(ellipse at center, #2e080b 0%, #150204 100%) !important; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
+                <div class="symbol"
+                    style="color: var(--crimson-light); font-size: 2.5rem; opacity: 0.8; margin-bottom: 0.8rem;">♠ ♥ ♣ ♦
+                </div>
+                <p
+                    style="font-size: 0.95rem; color: #ffb3b8; font-weight: 300; line-height: 1.6; letter-spacing: 0.5px;">
+                    El ingreso a esta noche de casino está reservado exclusivamente para invitados con código digital
+                    seguro.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Screen -->
+    <div id="admin-overlay" class="overlay-scrollable hidden">
+
+        <!-- Admin Header -->
+        <div class="admin-header">
+            <p class="cinzel-font welcome-sub">PANEL DE CONTROL</p>
+            <h1 class="rafa-title title-script admin-title-script">Administrador</h1>
+            <div class="suits-divider">♠ ♥ ♣ ♦</div>
+        </div>
+
+        <!-- Admin Body Wrapper -->
+        <div class="admin-body">
+
+            <!-- LEFT COLUMN: Login + Form (fills same height as table) -->
+            <div class="admin-left-col">
+
+                <!-- Password Gate -->
+                <div id="admin-login-group" class="admin-card">
+                    <h3 class="admin-card-title">🔐 ACCESO RESTRINGIDO</h3>
+                    <div class="admin-form-group">
+                        <label for="admin-pass" class="admin-label">Contraseña de Acceso</label>
+                        <input type="password" id="admin-pass" class="admin-input" placeholder="••••••••••">
+                    </div>
+                    <button id="admin-login-btn" class="admin-btn-primary">INGRESAR AL PANEL</button>
+                    <p id="admin-login-error" class="admin-error-msg hidden">⚠️ Contraseña incorrecta</p>
+                </div>
+
+                <!-- Generator Panel (Hidden until login) — stretches to table height -->
+                <div id="admin-generator-group" class="admin-card admin-form-stretch hidden">
+                    <h3 class="admin-card-title">🎟️ NUEVA INVITACIÓN</h3>
+                    <div class="admin-form-group">
+                        <label for="invite-guest-name" class="admin-label">Nombre del Invitado</label>
+                        <input type="text" id="invite-guest-name" class="admin-input" placeholder="Ej: Juan Pérez">
+                    </div>
+                    <div class="admin-form-group">
+                        <label for="invite-passes" class="admin-label">Número de Pases</label>
+                        <select id="invite-passes" class="admin-input admin-select">
+                            <option value="1">1 Pase — Solo Invitado</option>
+                            <option value="2">2 Pases — + 1 Acompañante</option>
+                            <option value="3">3 Pases — + 2 Acompañantes</option>
+                            <option value="4">4 Pases — + 3 Acompañantes</option>
+                            <option value="5">5 Pases — + 4 Acompañantes</option>
+                        </select>
+                    </div>
+                    <button id="generate-invite-btn" class="admin-btn-primary">✨ GENERAR INVITACIÓN</button>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Invitations Table -->
+            <div id="admin-table-container" class="admin-right-col hidden">
+                <div class="admin-card admin-table-card">
+                    <div class="admin-table-header">
+                        <h3 class="admin-card-title" style="margin-bottom:0;">📋 INVITACIONES GENERADAS</h3>
+                        <div style="display: flex; gap: 0.6rem; align-items: center;">
+                            <button id="admin-bulk-share-btn" class="admin-btn-primary" dir="ltr" style="display: none; font-size: 0.78rem; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-color: rgba(37,211,102,0.4);" title="Compartir seleccionados">📋 COMPARTIR SELECCIONADOS (<span id="admin-selected-count">0</span>)</button>
+                            <button id="admin-refresh-btn" class="admin-btn-icon" title="Recargar">↻</button>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="admin-filters">
+                        <div class="admin-search-wrap">
+                            <span class="admin-search-icon">🔍</span>
+                            <input type="text" id="admin-search" class="admin-input admin-search-input" placeholder="Buscar por nombre...">
+                        </div>
+                        <select id="admin-filter-status" class="admin-input admin-select admin-filter-select">
+                            <option value="todos">Todos los Estados</option>
+                            <option value="Pendiente">⏳ Pendiente</option>
+                            <option value="Confirmado">✅ Confirmado</option>
+                            <option value="Declinado">❌ Declinado</option>
+                        </select>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="admin-table-wrapper">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px; text-align: center; padding: 0.9rem 0.5rem;">
+                                        <input type="checkbox" id="admin-select-all" style="cursor: pointer; transform: scale(1.15);">
+                                    </th>
+                                    <th>INVITADO</th>
+                                    <th>PASES</th>
+                                    <th>ESTADO</th>
+                                    <th class="admin-th-actions">ACCIONES</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body">
+                                <tr>
+                                    <td colspan="5" class="admin-td-empty">Cargando invitaciones...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="admin-pagination">
+                        <span id="admin-pagination-info" class="admin-page-info">Mostrando 0 de 0</span>
+                        <div class="admin-page-btns">
+                            <button id="admin-page-prev" class="admin-btn-page">‹ Anterior</button>
+                            <button id="admin-page-next" class="admin-btn-page admin-btn-page-active">Siguiente ›</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- end admin-body -->
+
+        <!-- STATS BAR — Full width below both columns -->
+        <div id="admin-stats-group" class="admin-stats-bar hidden">
+            <div class="admin-stat-card">
+                <span class="admin-stat-icon">👥</span>
+                <div class="admin-stat-info">
+                    <span class="admin-stat-value" id="stat-total">0</span>
+                    <span class="admin-stat-label">Total Invitados</span>
+                </div>
+            </div>
+            <div class="admin-stat-card admin-stat-green">
+                <span class="admin-stat-icon">✅</span>
+                <div class="admin-stat-info">
+                    <span class="admin-stat-value" id="stat-confirmed">0</span>
+                    <span class="admin-stat-label">Confirmados</span>
+                </div>
+            </div>
+            <div class="admin-stat-card admin-stat-yellow">
+                <span class="admin-stat-icon">⏳</span>
+                <div class="admin-stat-info">
+                    <span class="admin-stat-value" id="stat-pending">0</span>
+                    <span class="admin-stat-label">Pendientes</span>
+                </div>
+            </div>
+            <div class="admin-stat-card admin-stat-red">
+                <span class="admin-stat-icon">❌</span>
+                <div class="admin-stat-info">
+                    <span class="admin-stat-value" id="stat-declined">0</span>
+                    <span class="admin-stat-label">Declinados</span>
+                </div>
+            </div>
+        </div>
+
+        <a href="index.html" class="admin-back-link cinzel-font">← VOLVER AL INICIO</a>
+    </div>
+
+    <!-- Edit Invitation Modal -->
+    <div id="edit-modal" class="admin-modal-overlay hidden">
+        <div class="admin-modal-box">
+            <h3 class="admin-card-title" style="text-align:center; margin-bottom:1.8rem;">✏️ EDITAR INVITACIÓN</h3>
+            <input type="hidden" id="edit-old-name">
+            <div class="admin-form-group">
+                <label for="edit-guest-name" class="admin-label">Nombre del Invitado</label>
+                <input type="text" id="edit-guest-name" class="admin-input">
+            </div>
+            <div class="admin-form-group">
+                <label for="edit-passes" class="admin-label">Pases Máximos</label>
+                <select id="edit-passes" class="admin-input admin-select">
+                    <option value="1">1 Pase — Solo Invitado</option>
+                    <option value="2">2 Pases — + 1 Acompañante</option>
+                    <option value="3">3 Pases — + 2 Acompañantes</option>
+                    <option value="4">4 Pases — + 3 Acompañantes</option>
+                    <option value="5">5 Pases — + 4 Acompañantes</option>
+                </select>
+            </div>
+            <div class="admin-form-group">
+                <label for="edit-status" class="admin-label">Estado de RSVP</label>
+                <select id="edit-status" class="admin-input admin-select">
+                    <option value="Pendiente">⏳ Pendiente</option>
+                    <option value="Confirmado">✅ Confirmado</option>
+                    <option value="Declinado">❌ Declinado</option>
+                </select>
+            </div>
+            <div class="admin-form-group" id="edit-confirmed-group">
+                <label for="edit-confirmed-passes" class="admin-label">Pases Confirmados</label>
+                <input type="number" id="edit-confirmed-passes" class="admin-input" min="0">
+            </div>
+            <div class="admin-modal-actions">
+                <button id="edit-cancel-btn" class="admin-btn-secondary">CANCELAR</button>
+                <button id="edit-save-btn" class="admin-btn-primary">GUARDAR CAMBIOS</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Share/Reenvío Invitation Modal -->
+    <div id="share-modal" class="admin-modal-overlay hidden">
+        <div class="admin-modal-box" style="max-width: 600px; width: 95%;">
+            <h3 class="admin-card-title" style="text-align:center; margin-bottom:1.5rem;">📋 REENVIAR INVITACIONES</h3>
+            <p style="font-size:0.85rem; color:#bbb; text-align:center; margin-bottom:1.5rem; line-height: 1.5; font-family: 'Montserrat', sans-serif;">
+                Haz clic en el botón de WhatsApp o Copiar de cada invitado para enviarlos uno por uno como mensajes separados.
+            </p>
+            <div id="share-modal-list">
+                <!-- Dynamically filled with selected invites -->
+            </div>
+            <div class="admin-modal-actions" style="justify-content: center;">
+                <button id="share-close-btn" class="admin-btn-secondary" style="max-width: 200px;">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dynamic Invitation Content -->
+    <main id="main-content" class="hidden">
+
+        <!-- Hero Section -->
+        <section class="section hero-v3">
+            <img src="assets/chip.png" alt="Chip Casino de Oro" class="floating-asset chip-1" data-tilt>
+            <img src="assets/chip.png" alt="Chip Casino" class="floating-asset chip-2" data-tilt>
+            <img src="assets/roulette.png" alt="Ruleta de Casino" class="floating-asset roulette-hero">
+
+            <!-- Floating suit watermarks -->
+            <div class="suit-watermark suit-wm-1">♠</div>
+            <div class="suit-watermark suit-wm-2">♥</div>
+            <div class="suit-watermark suit-wm-3">♣</div>
+            <div class="suit-watermark suit-wm-4">♦</div>
+
+            <div class="hero-text">
+                <p class="welcome-text">ESTÁS INVITADO A CELEBRAR</p>
+                <h1 class="rafa-name">Rafa</h1>
+                <h2 class="hero-years cinzel-font">15 AÑOS</h2>
+                <div class="hero-event-info cinzel-font">
+                    <span class="hero-info-item">♠ 15 AGO 2026</span>
+                    <span class="hero-info-sep">•</span>
+                    <span class="hero-info-item">8:30 PM</span>
+                    <span class="hero-info-sep">•</span>
+                    <span class="hero-info-item">CASUAL ♠</span>
+                </div>
+            </div>
+
+            <div class="hero-frame" data-tilt>
+                <img src="assets/photo1.png" alt="Rafa Retrato" class="main-portrait">
+            </div>
+        </section>
+
+        <!-- Elegant Quote Card -->
+        <section class="section">
+            <div class="glass-card-v3 reveal felt-card">
+                <div class="symbol">♣ ♦ ♠ ♥</div>
+                <p class="quote-text cinzel-font">"Hagan sus apuestas y prepárense para una noche que jamás olvidarán.
+                    La suerte está echada — y la tuya ya llegó."</p>
+            </div>
+        </section>
+
+        <!-- Live Countdown Timer -->
+        <section class="section">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 2rem;">EL EVENTO COMIENZA EN</h2>
+            <div class="timer-container reveal">
+                <div class="timer-box" data-tilt>
+                    <div class="timer-circle-wrap">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-circle-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="timer-circle-bar" id="days-bar" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <span class="timer-val" id="days">00</span>
+                    </div>
+                    <span class="timer-lbl">Días</span>
+                </div>
+                <div class="timer-box" data-tilt>
+                    <div class="timer-circle-wrap">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-circle-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="timer-circle-bar" id="hours-bar" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <span class="timer-val" id="hours">00</span>
+                    </div>
+                    <span class="timer-lbl">Horas</span>
+                </div>
+                <div class="timer-box" data-tilt>
+                    <div class="timer-circle-wrap">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-circle-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="timer-circle-bar" id="minutes-bar" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <span class="timer-val" id="minutes">00</span>
+                    </div>
+                    <span class="timer-lbl">Min</span>
+                </div>
+                <div class="timer-box" data-tilt>
+                    <div class="timer-circle-wrap">
+                        <svg class="timer-svg" viewBox="0 0 100 100">
+                            <circle class="timer-circle-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="timer-circle-bar" id="seconds-bar" cx="50" cy="50" r="45"></circle>
+                        </svg>
+                        <span class="timer-val" id="seconds">00</span>
+                    </div>
+                    <span class="timer-lbl">Seg</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Itinerary Timeline -->
+        <section class="section">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 4rem;">ITINERARIO DE LA NOCHE</h2>
+            <div class="timeline-container-v4">
+                <div class="timeline-line"></div>
+
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot">♣</div>
+                    <div class="timeline-content t-item" data-tilt>
+                        <div class="t-icon">🎟️</div>
+                        <div class="t-info">
+                            <span class="t-time">08:30 PM</span>
+                            <span class="t-name">Alfombra Roja & Recepción</span>
+                            <p class="t-desc">Bienvenida en Quinta Jardín San Marcos con alfombra roja, sesión
+                                fotográfica VIP y bebida de cortesía.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot">♦</div>
+                    <div class="timeline-content t-item" data-tilt>
+                        <div class="t-icon">🎲</div>
+                        <div class="t-info">
+                            <span class="t-time">09:00 PM</span>
+                            <span class="t-name">Apertura de Mesas</span>
+                            <p class="t-desc">Haz tus apuestas en Blackjack, Ruleta y Póker con tus fichas
+                                personalizadas de regalo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot">♠</div>
+                    <div class="timeline-content t-item" data-tilt>
+                        <div class="t-icon">🍽️</div>
+                        <div class="t-info">
+                            <span class="t-time">10:00 PM</span>
+                            <span class="t-name">Cena de Gala</span>
+                            <p class="t-desc">Banquete especial para celebrar esta noche única y llenar la velada de
+                                sabor.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot">♥</div>
+                    <div class="timeline-content t-item" data-tilt>
+                        <div class="t-icon">🥂</div>
+                        <div class="t-info">
+                            <span class="t-time">11:00 PM</span>
+                            <span class="t-name">Brindis Real & Pastel</span>
+                            <p class="t-desc">Celebramos oficialmente los 15 años de Rafa con brindis de champaña y el
+                                pastel especial.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="timeline-dot">♣</div>
+                    <div class="timeline-content t-item" data-tilt>
+                        <div class="t-icon">🎰</div>
+                        <div class="t-info">
+                            <span class="t-time">12:00 AM</span>
+                            <span class="t-name">After Party & DJ</span>
+                            <p class="t-desc">Se abre la pista de baile. El DJ oficial nos mantendrá bailando hasta el
+                                amanecer.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Venue / Google Maps Details -->
+        <section class="section">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 2rem;">LUGAR Y HORA</h2>
+            <div class="glass-card-v3 reveal" style="max-width: 750px; width: 100%;">
+                <p class="cinzel-font"
+                    style="font-size: 1.8rem; color: var(--gold); margin-bottom: 1.5rem; font-weight: bold; letter-spacing: 2px;">
+                    QUINTA JARDÍN SAN MARCOS</p>
+                <p
+                    style="font-size: 1.15rem; line-height: 1.8; margin-bottom: 2.5rem; font-weight: 300; letter-spacing: 1px;">
+                    Calle 34 #466 Norte, Colonia San Marcos<br>
+                    Sábado, 15 de Agosto de 2026 a las <strong style="color: var(--gold);">8:30 PM</strong>
+                </p>
+                <button class="gold-btn-v3"
+                    onclick="window.open('https://maps.google.com/?q=Calle+34+%23466+Norte+Colonia+San+Marcos', '_blank')"
+                    style="padding: 1.2rem 2.8rem; font-size: 0.95rem; font-weight: 700;">VER EN GOOGLE MAPS</button>
+            </div>
+        </section>
+
+        <!-- Misa Section -->
+        <section class="section">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 2rem;">LA MISA ⛪</h2>
+            <div class="glass-card-v3 reveal misa-card" style="max-width: 750px; width: 100%;">
+                <p class="cinzel-font"
+                    style="font-size: 1.5rem; color: var(--gold); margin-bottom: 1rem; font-weight: bold; letter-spacing: 2px;">
+                    SAN MARCOS</p>
+                <p style="font-size: 1.1rem; line-height: 1.8; font-weight: 300; letter-spacing: 1px; opacity: 0.85; margin-bottom: 1.5rem;">
+                    Te invitamos a acompañarnos a la ceremonia religiosa el<br>
+                    Sábado, 15 de Agosto de 2026 a las <strong style="color: var(--gold);">7:00 PM</strong>.<br>
+                    Dirección: <strong>Escobedo 3327, San Marcos</strong>
+                </p>
+                <button class="gold-btn-v3"
+                    onclick="window.open('https://maps.google.com/?q=Escobedo+3327,+San+Marcos', '_blank')"
+                    style="padding: 1.2rem 2.8rem; font-size: 0.95rem; font-weight: 700;">VER EN GOOGLE MAPS</button>
+                <div class="suits-divider" style="margin-top: 2.5rem;">♠ ♥ ♣ ♦</div>
+            </div>
+        </section>
+
+        <!-- Dress Code Section -->
+        <section class="section">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 2rem;">CÓDIGO DE VESTIMENTA</h2>
+            <div class="dress-code-grid reveal">
+                <div class="dress-card" data-tilt>
+                    <div class="dress-icon">👔</div>
+                    <h3 class="cinzel-font">CASUAL</h3>
+                    <p>Luce elegante y cómodo. Siéntete libre de lucir lo mejor de ti esa noche especial.</p>
+                </div>
+                <div class="dress-card dress-card-restricted" data-tilt>
+                    <div class="dress-icon">🔴</div>
+                    <h3 class="cinzel-font">ROJO / VINO</h3>
+                    <p>El color rojo y vino quedan <strong>reservados exclusivamente para el festejado</strong>.</p>
+                </div>
+                <div class="dress-card" data-tilt>
+                    <div class="dress-icon">✨</div>
+                    <h3 class="cinzel-font">TIP VIP</h3>
+                    <p>Los colores negro y dorado siempre lucen perfectos para una noche de Casino Night.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portrait Gallery -->
+        <section class="section">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 1rem;">GALERÍA</h2>
+            <p class="reveal"
+                style="font-weight: 300; opacity: 0.8; letter-spacing: 3px; font-size: 0.9rem; margin-bottom: 3rem; text-transform: uppercase;">
+                Momentos de Leyenda</p>
+            <div class="gallery-grid reveal">
+                <div class="gallery-card">
+                    <img src="assets/photo2.png" alt="Rafa 2" class="gallery-img">
+                    <div class="gallery-overlay-glow"></div>
+                </div>
+                <div class="gallery-card">
+                    <img src="assets/photo3.png" alt="Rafa 3" class="gallery-img">
+                    <div class="gallery-overlay-glow"></div>
+                </div>
+                <div class="gallery-card">
+                    <img src="assets/photo4.png" alt="Rafa 4" class="gallery-img">
+                    <div class="gallery-overlay-glow"></div>
+                </div>
+                <div class="gallery-card">
+                    <img src="assets/photo5.png" alt="Rafa 5" class="gallery-img">
+                    <div class="gallery-overlay-glow"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gift registry details -->
+        <section class="section">
+            <img src="assets/gift.png" alt="Caja de Regalo de Oro" class="gift-icon-v3 reveal">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 2rem;">MESA DE REGALOS</h2>
+            <div class="glass-card-v3 reveal" style="max-width: 750px; width: 100%;">
+                <p class="gift-text">
+                    "El mejor regalo es tu presencia en esta gran noche de gala. Si deseas tener un detalle con Rafa,
+                    agradecemos tu apoyo mediante transferencia bancaria o depositando en el buzón de sobres en la
+                    entrada del evento."
+                </p>
+                <div
+                    style="border-top: 1px solid var(--glass-border); padding-top: 2.5rem; margin-top: 2rem; display: flex; flex-direction: column; gap: 1.5rem; align-items: center; font-size: 1.05rem;">
+                    <p style="letter-spacing: 2px;"><strong>BANCO:</strong> BANCO DE LA FORTUNA</p>
+                    <div class="clabe-container" id="copy-clabe" style="cursor: pointer;">
+                        <p
+                            style="letter-spacing: 2px; margin: 0; padding: 0.8rem 1.8rem; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 30px; display: flex; align-items: center; gap: 1rem; transition: 0.3s;">
+                            <strong>CLABE:</strong> <span id="clabe-val">777123456789012345</span>
+                            <span class="copy-icon"
+                                style="color: var(--gold); font-size: 1.1rem; display: inline-block;">📋</span>
+                        </p>
+                    </div>
+                    <p style="letter-spacing: 2px;"><strong>TITULAR:</strong> RAFAEL CASTANEDA</p>
+                </div>
+                <p class="thank-you" style="margin-top: 3.5rem;">¡MUCHAS GRACIAS!</p>
+            </div>
+        </section>
+
+        <!-- RSVP Form & WhatsApp -->
+        <section class="section">
+            <h2 class="cinzel-font section-neon reveal" style="margin-bottom: 2rem;">CONFIRMACIÓN</h2>
+            <div class="rsvp-card-v3 reveal">
+                <h3 class="cinzel-font"
+                    style="font-size: 2.2rem; color: #fff; margin-bottom: 1.2rem; letter-spacing: 3px;">ASEGURA TU LUGAR
+                </h3>
+                <p
+                    style="font-weight: 300; opacity: 0.8; margin-bottom: 3.5rem; line-height: 1.6; font-size: 1.05rem; letter-spacing: 1px;">
+                    Por favor, confirma tu asistencia antes del 1 de Agosto de 2026 para asegurar tus pases de juego en
+                    el casino.
+                </p>
+
+                <!-- Form RSVP -->
+                <form id="rsvp-form">
+                    <div class="form-group">
+                        <label for="rsvp-name" class="form-label">Nombre Completo</label>
+                        <input type="text" id="rsvp-name" class="form-input" placeholder="Ingresa tu nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rsvp-guests" class="form-label">Acompañantes</label>
+                        <select id="rsvp-guests" class="form-input"
+                            style="appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 fill=%22%23d4af37%22><polygon points=%220,0 10,0 5,5%22/></svg>'); background-repeat: no-repeat; background-position: right 1.8rem center; background-size: 12px; cursor: pointer;"
+                            required>
+                            <option value="0">Solo Yo (1 pase)</option>
+                            <option value="1">1 Acompañante (2 pases)</option>
+                            <option value="2">2 Acompañantes (3 pases)</option>
+                            <option value="3">3 Acompañantes (4 pases)</option>
+                        </select>
+                    </div>
+                    <div class="rsvp-buttons-container">
+                        <button type="submit" id="rsvp-confirm-btn" class="gold-btn-v3 submit-btn-v3">CONFIRMAR ASISTENCIA</button>
+                        <button type="button" id="rsvp-decline-btn" class="decline-btn-v3">NO ASISTIRÉ</button>
+                    </div>
+                </form>
+
+                <!-- Success pass (simple elegant confirmation box) -->
+                <div id="rsvp-message" style="display: none; text-align: center; padding: 2.5rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+                    <h3 class="cinzel-font" style="color: var(--gold); font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: 2px;">¡ASISTENCIA CONFIRMADA!</h3>
+                    <p style="font-weight: 300; line-height: 1.6; color: #eee; font-size: 1.1rem; letter-spacing: 0.5px; margin-bottom: 1rem;">
+                        Tu respuesta ha sido registrada. ¡Gracias por confirmar!
+                    </p>
+                    <p id="pass-count-text" style="font-weight: 400; color: var(--gold); font-size: 1.2rem; letter-spacing: 1px;"></p>
+                </div>
+                <!-- Decline RSVP message -->
+                <div id="rsvp-decline-message" style="display: none; text-align: center; padding: 2.5rem; background: rgba(176, 21, 37, 0.08); border: 1px solid rgba(176, 21, 37, 0.4); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+                    <h3 class="cinzel-font" style="color: var(--crimson-light); font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: 2px;">RESPUESTA REGISTRADA</h3>
+                    <p style="font-weight: 300; line-height: 1.6; color: #eee; font-size: 1.1rem; letter-spacing: 0.5px;">Lamentamos que no puedas asistir. ¡Gracias por informarnos!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer>
+            <div class="f-logo title-script">Rafa</div>
+            <p class="cinzel-font footer-title">15 AÑOS • CASINO NIGHT</p>
+            <p class="f-tag cinzel-font" style="margin-top: 1rem;">15 DE AGOSTO 2026 • 8:30 PM • CASUAL</p>
+            <p class="f-tag cinzel-font" style="margin-top: 0.5rem; color: var(--crimson-light);">🔴 ROJO/VINO RESERVADO
+                PARA EL FESTEJADO 🔴</p>
+            <div class="suits-divider" style="margin-top: 3rem; font-size: 2rem; opacity: 0.3;">♠ ♥ ♣ ♦</div>
+        </footer>
+
+    </main>
+
+    <!-- Library Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- SVG Gradients Definition -->
+    <svg style="width:0; height:0; position:absolute;">
+        <defs>
+            <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#f9e272" />
+                <stop offset="50%" stop-color="#d4af37" />
+                <stop offset="100%" stop-color="#996515" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="lightbox">
+        <div class="lightbox-close" id="lightbox-close">♣</div>
+        <div class="lightbox-arrow lightbox-prev" id="lightbox-prev">◀</div>
+        <div class="lightbox-arrow lightbox-next" id="lightbox-next">▶</div>
+        <div class="lightbox-content" data-tilt>
+            <img id="lightbox-img" src="" alt="VIP Gallery Moment">
+            <div class="lightbox-caption cinzel-font">MOMENTOS DE LEYENDA</div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 100000; display: flex; flex-direction: column; gap: 0.8rem; pointer-events: none;"></div>
+
+    <!-- App Script -->
+    <script src="script.js?v=5"></script>
+</body>
+
+</html>

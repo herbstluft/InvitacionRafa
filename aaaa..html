@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Línea del Tiempo – Precursores de la Pedagogía</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,800;1,600&family=Lato:wght@300;400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1a2b4a;
+            --gold: #c9922a;
+            --cream: #fdf8f0;
+            --line: #c9922a;
+            --shadow: rgba(26, 43, 74, 0.15);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        @page {
+            size: A4 portrait;
+            margin: 12mm 14mm;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--cream);
+            color: var(--navy);
+            font-size: 10pt;
+            line-height: 1.5;
+        }
+
+        /* ── COVER ── */
+        .cover {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            page-break-after: always;
+            background: var(--navy);
+            color: var(--cream);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 30%, rgba(201, 146, 42, 0.18) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(201, 146, 42, 0.12) 0%, transparent 60%);
+        }
+
+        .cover-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-subtitle {
+            font-family: 'Lato', sans-serif;
+            font-weight: 300;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            font-size: 9pt;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .cover-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 44pt;
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 16px;
+            color: #fff;
+        }
+
+        .cover-desc {
+            font-family: 'Playfair Display', serif;
+            font-size: 16pt;
+            font-style: italic;
+            color: rgba(253, 248, 240, 0.75);
+            margin-bottom: 32px;
+        }
+
+        .cover-bar {
+            width: 80px;
+            height: 3px;
+            background: var(--gold);
+            margin: 0 auto 24px;
+        }
+
+        .cover-dates {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 13pt;
+            letter-spacing: 3px;
+            color: var(--gold);
+        }
+
+        .cover-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-top: 48px;
+            opacity: 0.35;
+        }
+
+        .cover-grid img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 4px;
+            filter: grayscale(40%);
+        }
+
+        /* ── TIMELINE LAYOUT ── */
+        .timeline-container {
+            padding: 8mm 0;
+        }
+
+        .person-block {
+            display: grid;
+            grid-template-columns: 105px 28px 1fr;
+            gap: 0;
+            margin-bottom: 0;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            min-height: 140px;
+        }
+
+        /* Left column: photo + name */
+        .person-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 8px 10px 0;
+        }
+
+        .person-photo {
+            width: 84px;
+            height: 100px;
+            object-fit: cover;
+            object-position: top center;
+            border-radius: 6px;
+            border: 3px solid var(--gold);
+            box-shadow: 0 3px 12px var(--shadow);
+            background: #ddd;
+        }
+
+        .person-photo-placeholder {
+            width: 84px;
+            height: 100px;
+            border-radius: 6px;
+            border: 3px solid var(--gold);
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+            font-size: 28pt;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .person-name-left {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 7.5pt;
+            text-align: center;
+            color: var(--navy);
+            margin-top: 5px;
+            line-height: 1.2;
+        }
+
+        /* Center column: timeline */
+        .person-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .timeline-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 3px solid var(--navy);
+            box-shadow: 0 0 0 2px var(--gold);
+            z-index: 2;
+            margin-top: 16px;
+            flex-shrink: 0;
+        }
+
+        .timeline-vline {
+            flex: 1;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--gold), rgba(201, 146, 42, 0.3));
+        }
+
+        .timeline-vline-top {
+            height: 16px;
+            width: 3px;
+            background: rgba(201, 146, 42, 0.3);
+        }
+
+        /* Right column: content */
+        .person-content {
+            padding: 8px 0 8px 12px;
+            border-left: none;
+        }
+
+        .person-header {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 5px;
+            flex-wrap: wrap;
+        }
+
+        .person-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 14pt;
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1;
+        }
+
+        .person-years {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 9pt;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+
+        .person-origin {
+            font-family: 'Lato', sans-serif;
+            font-weight: 300;
+            font-size: 7.5pt;
+            color: #666;
+            font-style: italic;
+        }
+
+        .person-divider {
+            height: 2px;
+            background: linear-gradient(to right, var(--gold), transparent);
+            margin-bottom: 7px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .info-box {
+            background: #fff;
+            border-radius: 5px;
+            padding: 6px 8px;
+            border-left: 3px solid var(--gold);
+            box-shadow: 0 1px 4px var(--shadow);
+        }
+
+        .info-box.contrib {
+            grid-column: 1 / -1;
+            border-left-color: var(--navy);
+            background: rgba(26, 43, 74, 0.04);
+        }
+
+        .info-label {
+            font-family: 'Lato', sans-serif;
+            font-weight: 700;
+            font-size: 6.5pt;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+
+        .info-box.contrib .info-label {
+            color: var(--navy);
+        }
+
+        .info-text {
+            font-family: 'Lato', sans-serif;
+            font-size: 8pt;
+            line-height: 1.45;
+            color: #333;
+        }
+
+        .block-separator {
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(201, 146, 42, 0.3), transparent);
+            margin: 4px 0;
+        }
+
+        /* Page break helpers */
+        .page-break {
+            page-break-before: always;
+            break-before: page;
+        }
+
+        /* Print-specific */
+        @media print {
+            @page {
+                margin: 0;
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin: 0;
+            }
+
+            .cover {
+                min-height: 100vh;
+                padding: 12mm 14mm;
+                box-sizing: border-box;
+            }
+
+            .timeline-container {
+                padding: 12mm 14mm 8mm;
+                box-sizing: border-box;
+            }
+
+            .person-block {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+        }
+
+        /* Screen preview */
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                padding: 10mm;
+                background: #e8e8e8;
+            }
+
+            .cover {
+                border-radius: 8px;
+                margin-bottom: 20px;
+                min-height: 200px;
+                padding: 60px 40px;
+            }
+
+            .timeline-container {
+                background: var(--cream);
+                padding: 20px 16px;
+                border-radius: 8px;
+                margin-bottom: 16px;
+            }
+
+            .print-hint {
+                background: var(--navy);
+                color: #fff;
+                text-align: center;
+                padding: 12px;
+                border-radius: 6px;
+                margin-bottom: 16px;
+                font-family: 'Lato', sans-serif;
+                font-size: 10pt;
+            }
+        }
+
+        @media print {
+            .print-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══════════════════════════════════════════════
+     PORTADA
+══════════════════════════════════════════════ -->
+    <div class="cover">
+        <div class="cover-inner">
+            <div class="cover-subtitle">Historia de la Educación</div>
+            <div class="cover-title">Línea del Tiempo</div>
+            <div class="cover-bar"></div>
+            <div class="cover-desc">Precursores de la Pedagogía</div>
+            <div class="cover-dates">470 a.C. &mdash; 1980 d.C.</div>
+
+            <div class="cover-grid">
+                <img src="https://pymstatic.com/111657/conversions/socrates-social.jpg"
+                    onerror="this.style.display='none'" alt="Sócrates">
+                <img src="https://www.elsaltodiario.com/uploads/fotos/r2000/b4f00f31/Platon.jpg"
+                    onerror="this.style.display='none'" alt="Platón">
+                <img src="https://fichas.universomarvel.com/autores/fotos/aristoteles.jpg"
+                    onerror="this.style.display='none'" alt="Aristóteles">
+                <img src="https://images.theconversation.com/files/661296/original/file-20250411-62-utm2o4.jpeg"
+                    onerror="this.style.display='none'" alt="Comenio">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Jean-Jacques_Rousseau_%28painted_portrait%29.jpg/960px-Jean-Jacques_Rousseau_%28painted_portrait%29.jpg"
+                    onerror="this.style.display='none'" alt="Rousseau">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Maria_Montessori_%28portrait%29.jpg/960px-Maria_Montessori_%28portrait%29.jpg"
+                    onerror="this.style.display='none'" alt="Montessori">
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+     PÁGINA 1
+══════════════════════════════════════════════ -->
+    <div class="timeline-container">
+
+        <!-- SÓCRATES -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo" src="https://pymstatic.com/111657/conversions/socrates-social.jpg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>S</div>'" alt="Sócrates">
+                <div class="person-name-left">Sócrates</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-vline-top"></div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Sócrates</span>
+                    <span class="person-years">470 – 399 a.C.</span>
+                    <span class="person-origin">Atenas, Grecia</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Filósofo griego, padre del pensamiento occidental y maestro de Platón. No
+                            dejó escritos; sus ideas se conocen por sus discípulos.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Dialogaba en las plazas de Atenas, cuestionando creencias para llevar a
+                            sus interlocutores a descubrir la verdad por sí mismos.</div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Inventó la <strong>mayéutica</strong>: el arte de hacer preguntas para
+                            que el alumno descubra el conocimiento por sí mismo en lugar de recibirlo pasivamente. Base
+                            del aprendizaje dialógico.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- PLATÓN -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo" src="https://www.elsaltodiario.com/uploads/fotos/r2000/b4f00f31/Platon.jpg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>P</div>'" alt="Platón">
+                <div class="person-name-left">Platón</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Platón</span>
+                    <span class="person-years">428 – 348 a.C.</span>
+                    <span class="person-origin">Atenas, Grecia</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Filósofo y matemático griego, discípulo de Sócrates. Fundó la
+                            <em>Academia de Atenas</em>, una de las primeras instituciones de educación superior.
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Escribió extensas obras filosóficas en forma de diálogos y dirigió la
+                            Academia durante décadas formando a los mejores pensadores de su época.</div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Planteó que la educación debe cultivar el <strong>alma y la
+                                virtud</strong>, y que el Estado es responsable de la formación integral del ciudadano.
+                            Su <em>República</em> describe el primer sistema educativo basado en la justicia.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- ARISTÓTELES -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo" src="https://fichas.universomarvel.com/autores/fotos/aristoteles.jpg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>A</div>'" alt="Aristóteles">
+                <div class="person-name-left">Aristóteles</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Aristóteles</span>
+                    <span class="person-years">384 – 322 a.C.</span>
+                    <span class="person-origin">Estagira, Macedonia</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Discípulo de Platón, tutor de Alejandro Magno y fundador del Liceo. Padre
+                            de la lógica, la biología, la ética y la política.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Sistematizó el conocimiento de su época y enseñó en el Liceo con el
+                            método peripatético: pasear y discutir. Escribió sobre casi todos los temas.</div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Propuso una <strong>educación en tres etapas</strong> según la edad
+                            (cuerpo, apetito, razón) y defendió que el conocimiento parte de la experiencia sensorial.
+                            Anticipó la psicología evolutiva moderna.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /timeline-container -->
+
+    <!-- ══════════════════════════════════════════════
+     PÁGINA 2
+══════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="timeline-container">
+
+        <!-- COMENIO -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://images.theconversation.com/files/661296/original/file-20250411-62-utm2o4.jpeg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>C</div>'" alt="Comenio">
+                <div class="person-name-left">Juan Amós Comenio</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-vline-top"></div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Juan Amós Comenio</span>
+                    <span class="person-years">1592 – 1670</span>
+                    <span class="person-origin">Nivnice, Moravia (Rep. Checa)</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Teólogo y pedagogo checo, llamado el <em>"Padre de la Pedagogía
+                                Moderna"</em>. Fue el primero en sistematizar la teoría y práctica educativa.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Viajó por Europa reformando sistemas educativos. Escribió la
+                            <em>Didáctica Magna</em> (1632) y el primer libro de texto ilustrado para niños (<em>Orbis
+                                Pictus</em>, 1658).
+                        </div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Estableció los principios de <strong>enseñar todo a todos</strong>
+                            (pansofía), graduar el aprendizaje por edad, usar imágenes como apoyo y organizar la escuela
+                            en grados. Fundó la <strong>didáctica</strong> como ciencia.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- ROUSSEAU -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Jean-Jacques_Rousseau_%28painted_portrait%29.jpg/960px-Jean-Jacques_Rousseau_%28painted_portrait%29.jpg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>R</div>'" alt="Rousseau">
+                <div class="person-name-left">Jean-Jacques Rousseau</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Jean-Jacques Rousseau</span>
+                    <span class="person-years">1712 – 1778</span>
+                    <span class="person-origin">Ginebra, Suiza</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Filósofo ilustrado suizo-francés. Su obra influyó en la Revolución
+                            Francesa y en el romanticismo europeo. Considerado un radical educativo de su época.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Escribió <em>Emilio o De la educación</em> (1762), novela pedagógica que
+                            describe cómo educar a un niño de forma natural, lejos de la corrupción social.</div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Proclamó la <strong>educación centrada en el niño</strong>
+                            (paidocentrismo): el niño es naturalmente bueno y la educación debe respetar su desarrollo
+                            natural. Anticipó la Escuela Nueva y el aprendizaje activo.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- PESTALOZZI -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Johann_Heinrich_Pestalozzi_%28Real_Academia_de_Bellas_Artes_de_San_Fernando%2C_Madrid%29.jpg/960px-Johann_Heinrich_Pestalozzi_%28Real_Academia_de_Bellas_Artes_de_San_Fernando%2C_Madrid%29.jpg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>P</div>'" alt="Pestalozzi">
+                <div class="person-name-left">Johann H. Pestalozzi</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Johann H. Pestalozzi</span>
+                    <span class="person-years">1746 – 1827</span>
+                    <span class="person-origin">Zúrich, Suiza</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Pedagogo y reformador educativo suizo seguidor de Rousseau. Dedicó su
+                            vida a educar a niños pobres y huérfanos en diversas escuelas experimentales.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Fundó institutos educativos en Neuhof, Stans, Burgdorf e Yverdon.
+                            Escribió <em>Cómo enseña Gertrudis a sus hijos</em> (1801), muy influyente en su época.
+                        </div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Desarrolló el <strong>método intuitivo</strong>: enseñar de lo concreto a
+                            lo abstracto, de lo cercano a lo lejano. Propuso unir educación, instrucción y formación
+                            moral. Concibió la escuela como extensión del hogar.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+     PÁGINA 3
+══════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="timeline-container">
+
+        <!-- HERBART -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo" src="https://encyclopaedia.herdereditorial.com/w/images/d/df/Herbart1.gif"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>H</div>'" alt="Herbart">
+                <div class="person-name-left">Johann F. Herbart</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-vline-top"></div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Johann F. Herbart</span>
+                    <span class="person-years">1776 – 1841</span>
+                    <span class="person-origin">Oldenburg, Alemania</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Filósofo, psicólogo y pedagogo alemán, sucesor de Kant en Königsberg.
+                            Fundador de la pedagogía científica y precursor de la psicología experimental.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Buscó fundamentar la pedagogía en la psicología y la ética. Escribió
+                            <em>Pedagogía General</em> (1806) y <em>Bosquejo para un curso de pedagogía</em> (1835).
+                        </div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Creó los <strong>pasos formales de la enseñanza</strong>: preparación,
+                            presentación, asociación, generalización y aplicación, base del modelo de lección. Concibió
+                            la pedagogía como ciencia autónoma.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- FRÖBEL -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Frederick-Froebel-Bardeen.jpeg/960px-Frederick-Froebel-Bardeen.jpeg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>F</div>'" alt="Fröbel">
+                <div class="person-name-left">Friedrich Fröbel</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Friedrich Fröbel</span>
+                    <span class="person-years">1782 – 1852</span>
+                    <span class="person-origin">Oberweißbach, Alemania</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Pedagogo alemán discípulo de Pestalozzi. Fundador del
+                            <em>Kindergarten</em> (jardín de infantes), el primer sistema educativo formal para niños
+                            pequeños.
+                        </div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Fundó el primer jardín de infantes en Blankenburg (1837) y creó
+                            materiales educativos especiales llamados <em>"dones de Fröbel"</em> para el juego y la
+                            exploración.</div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Reconoció el <strong>juego como actividad central del
+                                aprendizaje</strong> infantil. Creó la educación preescolar organizada y estableció que
+                            los primeros años de vida son fundamentales para el desarrollo.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- DEWEY -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://hablaconlahistoria.es/wp-content/uploads/2024/07/John-Dewey-IA.webp"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>D</div>'" alt="John Dewey">
+                <div class="person-name-left">John Dewey</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">John Dewey</span>
+                    <span class="person-years">1859 – 1952</span>
+                    <span class="person-origin">Burlington, Vermont, EE.UU.</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Filósofo, psicólogo y reformador educativo estadounidense. Principal
+                            representante del pragmatismo. Uno de los pensadores más influyentes del siglo XX.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Fundó la <em>Escuela Laboratorio</em> en la U. de Chicago (1896).
+                            Escribió <em>Mi credo pedagógico</em> (1897) y <em>Democracia y Educación</em> (1916).</div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Planteó que <strong>se aprende haciendo</strong> (<em>learning by
+                                doing</em>). La escuela debe ser una comunidad democrática donde el alumno aprende
+                            resolviendo problemas reales. Padre del constructivismo y la educación progresista.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+     PÁGINA 4
+══════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="timeline-container">
+
+        <!-- MONTESSORI -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Maria_Montessori_%28portrait%29.jpg/960px-Maria_Montessori_%28portrait%29.jpg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>M</div>'" alt="María Montessori">
+                <div class="person-name-left">María Montessori</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-vline-top"></div>
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">María Montessori</span>
+                    <span class="person-years">1870 – 1952</span>
+                    <span class="person-origin">Chiaravalle, Italia</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Médica y pedagoga italiana. Primera mujer en graduarse de medicina en
+                            Italia. Desarrolló uno de los métodos pedagógicos más difundidos del mundo.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Trabajó con niños con discapacidad intelectual y abrió la primera
+                            <em>Casa dei Bambini</em> en Roma (1907). Viajó por todo el mundo difundiendo su método.
+                        </div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Creó el <strong>Método Montessori</strong>: ambiente preparado,
+                            materiales sensoriales específicos y autoeducación. Defendió que el niño tiene un potencial
+                            natural de aprendizaje que el adulto debe respetar, no obstaculizar.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- PIAGET -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://upload.wikimedia.org/wikipedia/commons/6/67/Jean_Piaget_in_Ann_Arbor.png"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>P</div>'" alt="Jean Piaget">
+                <div class="person-name-left">Jean Piaget</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Jean Piaget</span>
+                    <span class="person-years">1896 – 1980</span>
+                    <span class="person-origin">Neuchâtel, Suiza</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Psicólogo y epistemólogo suizo, padre de la epistemología genética.
+                            Trabajó en el Instituto Rousseau de Ginebra durante más de cinco décadas.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Estudió el desarrollo cognitivo durante más de 50 años, realizando
+                            observaciones sistemáticas de sus propios hijos y de cientos de niños.</div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Describió los <strong>estadios del desarrollo cognitivo</strong>
+                            (sensoriomotor, preoperacional, operacional concreto y formal), mostrando que el
+                            conocimiento se construye activamente. Fundó el <strong>constructivismo cognitivo</strong>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="block-separator"></div>
+
+        <!-- VYGOTSKY -->
+        <div class="person-block">
+            <div class="person-left">
+                <img class="person-photo"
+                    src="https://upload.wikimedia.org/wikipedia/commons/6/67/Lev-Semyonovich-Vygotsky-1896-1934.jpg"
+                    onerror="this.outerHTML='<div class=\'person-photo-placeholder\'>V</div>'" alt="Lev Vygotsky">
+                <div class="person-name-left">Lev Vygotsky</div>
+            </div>
+            <div class="person-line">
+                <div class="timeline-dot"></div>
+                <div class="timeline-vline"></div>
+            </div>
+            <div class="person-content">
+                <div class="person-header">
+                    <span class="person-name">Lev Vygotsky</span>
+                    <span class="person-years">1896 – 1934</span>
+                    <span class="person-origin">Orsha, Bielorrusia (Imperio Ruso)</span>
+                </div>
+                <div class="person-divider"></div>
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">¿Quién era?</div>
+                        <div class="info-text">Psicólogo soviético llamado el <em>"Mozart de la psicología"</em>. Murió
+                            a los 37 años pero dejó una obra vastísima que influyó profundamente en la educación del
+                            siglo XX.</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">¿Qué hacía?</div>
+                        <div class="info-text">Investigó el lenguaje, el pensamiento y el aprendizaje social. Escribió
+                            <em>Pensamiento y lenguaje</em> (1934) y desarrolló la teoría histórico-cultural del
+                            desarrollo.
+                        </div>
+                    </div>
+                    <div class="info-box contrib">
+                        <div class="info-label">✦ Aportación pedagógica</div>
+                        <div class="info-text">Acuñó la <strong>Zona de Desarrollo Próximo (ZDP)</strong>: la distancia
+                            entre lo que el niño puede hacer solo y con ayuda. Destacó el rol del lenguaje, la cultura y
+                            la interacción social. Base del <strong>constructivismo social</strong>.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final quote -->
+        <div style="text-align:center; margin-top: 24px; padding: 16px; border-top: 2px solid var(--gold);">
+            <p style="font-family:'Playfair Display',serif; font-size:10pt; font-style:italic; color:#666;">
+                "La educación no es preparación para la vida; la educación es la vida misma."
+            </p>
+            <p
+                style="font-family:'Lato',sans-serif; font-size:8pt; font-weight:700; color:var(--gold); letter-spacing:2px; margin-top:6px;">
+                — JOHN DEWEY
+            </p>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

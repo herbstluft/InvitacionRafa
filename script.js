@@ -1,0 +1,1355 @@
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- Safe Storage Helpers ---
+    const getStorageItem = (key) => {
+        try {
+            return localStorage.getItem(key);
+        } catch (e) {
+            console.warn("Storage access error:", e);
+            return null;
+        }
+    };
+    const setStorageItem = (key, value) => {
+        try {
+            localStorage.setItem(key, value);
+        } catch (e) {
+            console.warn("Storage access error:", e);
+        }
+    };
+
+    // --- Cryptography Helpers for Invitation Locking ---
+    const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzMrIRo-1w32iPpm64JhNgU4xCFYrmVzsKfUozAZ-tKbbkIW5OrxylvK7Map3sLtbMmMg/exec";
+    const SECRET_PASSPHRASE = "Rafa30CasinoRoyale2026!"; // Secret key for AES-CBC
+    
+    const str2ab = (str) => new TextEncoder().encode(str);
+    const ab2str = (buf) => new TextDecoder().decode(buf);
+
+    const hexToBuf = (hex) => {
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < bytes.length; i++) {
+            bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+        }
+        return bytes.buffer;
+    };
+
+    const bufToHex = (buf) => {
+        return Array.from(new Uint8Array(buf))
+            .map(b => b.toString(16).padStart(2, '0'))
+            .join('');
+    };
+
+    async function deriveKey() {
+        const msgUint8 = str2ab(SECRET_PASSPHRASE);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        return await crypto.subtle.importKey(
+            'raw',
+            hashBuffer,
+            { name: 'AES-CBC' },
+            false,
+            ['encrypt', 'decrypt']
+        );
+    }
+
+    async function encryptInvite(dataObj) {
+        try {
+            const dataText = JSON.stringify(dataObj);
+            const key = await deriveKey();
+            const iv = crypto.getRandomValues(new Uint8Array(16));
+            const encrypted = await crypto.subtle.encrypt(
+                { name: 'AES-CBC', iv: iv },
+                key,
+                str2ab(dataText)
+            );
+            return bufToHex(iv.buffer) + "_" + bufToHex(encrypted);
+        } catch (e) {
+            console.error("Encryption failed:", e);
+            return null;
+        }
+    }
+
+    async function decryptInvite(token) {
+        try {
+            const parts = token.split('_');
+            if (parts.length !== 2) return null;
+            const ivBuf = hexToBuf(parts[0]);
+            const ciphertextBuf = hexToBuf(parts[1]);
+            const key = await deriveKey();
+            const decrypted = await crypto.subtle.decrypt(
+                { name: 'AES-CBC', iv: new Uint8Array(ivBuf) },
+                key,
+                ciphertextBuf
+            );
+            return JSON.parse(ab2str(decrypted));
+        } catch (e) {
+            console.error("Decryption failed:", e);
+            return null;
+        }
+    }
+
+    // --- Access Control / Routing Views ---
+    const showAccessDenied = (msg) => {
+        const landingOverlay = document.getElementById('landing-overlay');
+        const deniedOverlay = document.getElementById('denied-overlay');
+        const deniedMessage = document.getElementById('denied-message');
+        const mainContent = document.getElementById('main-content');
+        
+        if (landingOverlay) landingOverlay.classList.add('hidden');
+        if (mainContent) mainContent.classList.add('hidden');
+        if (deniedOverlay) deniedOverlay.classList.remove('hidden');
+        if (deniedMessage) deniedMessage.innerText = msg;
+    };
+
+    const setupGuestInvitation = (guestData) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const passToken = urlParams.get('pass');
+        const rsvpStatus = passToken ? getStorageItem('rsvp_status_' + passToken) : null;
+
+        const landingOverlay = document.getElementById('landing-overlay');
+        const mainContent = document.getElementById('main-content');
+        const rsvpForm = document.getElementById('rsvp-form');
+        const rsvpMessage = document.getElementById('rsvp-message');
+        const rsvpDeclineMessage = document.getElementById('rsvp-decline-message');
+
+        // Check if already responded
+        if (rsvpStatus && rsvpForm) {
+            // Skip landing overlay
+            if (landingOverlay) landingOverlay.style.display = 'none';
+            if (mainContent) mainContent.classList.remove('hidden');
+
+            rsvpForm.style.display = 'none';
+
+            if (rsvpStatus === 'confirmed') {
+                if (rsvpMessage) rsvpMessage.style.display = 'block';
+                const countEl = document.getElementById('pass-count-text');
+                const passText = getStorageItem('rsvp_pass_text_' + passToken) || "1 PASE";
+                if (countEl) countEl.innerText = "ACCESO AUTORIZADO: " + passText;
+            } else if (rsvpStatus === 'declined') {
+                if (rsvpDeclineMessage) rsvpDeclineMessage.style.display = 'block';
+            }
+        }
+
+        const greetingEl = document.getElementById('card-invite-greeting');
+        if (greetingEl) {
+            greetingEl.innerHTML = `Te invita, <strong style="color: var(--gold);">${guestData.name}</strong>, a celebrar su fiesta de`;
+        }
+
+        const rsvpNameInput = document.getElementById('rsvp-name');
+        if (rsvpNameInput) {
+            rsvpNameInput.value = guestData.name;
+            rsvpNameInput.readOnly = true;
+            rsvpNameInput.style.opacity = '0.75';
+            rsvpNameInput.style.cursor = 'not-allowed';
+        }
+
+        const rsvpGuestsSelect = document.getElementById('rsvp-guests');
+        if (rsvpGuestsSelect) {
+            rsvpGuestsSelect.innerHTML = '';
+            const maxPasses = parseInt(guestData.passes, 10) || 1;
+            for (let i = 1; i <= maxPasses; i++) {
+                const opt = document.createElement('option');
+                opt.value = (i - 1).toString();
+                if (i === 1) {
+                    opt.textContent = `Solo Yo (1 pase)`;
+                } else {
+                    opt.textContent = `${i - 1} Acompañante${i > 2 ? 's' : ''} (${i} pases)`;
+                }
+                rsvpGuestsSelect.appendChild(opt);
+            }
+        }
+
+    };
+
+    // --- Toast Notification System ---
+    const showToast = (message, type = 'success') => {
+        let container = document.getElementById('admin-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'admin-toast-container';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.className = `admin-toast${type === 'error' ? ' toast-error' : ''}`;
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.add('toast-exit');
+            toast.addEventListener('animationend', () => toast.remove());
+        }, 3500);
+    };
+
+    // --- IndexedDB Cache Helper for Admin Invites ---
+    const DB_NAME = 'CasinoRoyaleDB';
+    const STORE_NAME = 'admin_invites';
+    const DB_VERSION = 1;
+
+    function openDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            request.onerror = (e) => reject(e.target.error);
+            request.onsuccess = (e) => resolve(e.target.result);
+            request.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+        });
+    }
+
+    async function getCachedInvites() {
+        try {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.get('list');
+                request.onsuccess = (e) => resolve(e.target.result || null);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        } catch (err) {
+            console.error("IndexedDB read error:", err);
+            return null;
+        }
+    }
+
+    async function saveCachedInvites(invites) {
+        try {
+            const db = await openDB();
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction(STORE_NAME, 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(invites, 'list');
+                request.onsuccess = () => resolve(true);
+                request.onerror = (e) => reject(e.target.error);
+            });
+        } catch (err) {
+            console.error("IndexedDB write error:", err);
+            return false;
+        }
+    }
+
+    const initAdminLogic = () => {
+        const adminPassInput = document.getElementById('admin-pass');
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const adminLoginError = document.getElementById('admin-login-error');
+        const adminLoginGroup = document.getElementById('admin-login-group');
+        const adminGeneratorGroup = document.getElementById('admin-generator-group');
+
+        const editModal = document.getElementById('edit-modal');
+        const editOldName = document.getElementById('edit-old-name');
+        const editGuestName = document.getElementById('edit-guest-name');
+        const editPasses = document.getElementById('edit-passes');
+        const editStatus = document.getElementById('edit-status');
+        const editConfirmedPasses = document.getElementById('edit-confirmed-passes');
+        const editCancelBtn = document.getElementById('edit-cancel-btn');
+        const editSaveBtn = document.getElementById('edit-save-btn');
+
+        let allInvites = [];
+        let currentPage = 1;
+        const recordsPerPage = 8;
+        const selectedGuests = new Set();
+
+        const updateBulkShareButtonState = () => {
+            const bulkBtn = document.getElementById('admin-bulk-share-btn');
+            const countSpan = document.getElementById('admin-selected-count');
+            const selectAllCb = document.getElementById('admin-select-all');
+            const tbody = document.getElementById('admin-table-body');
+            
+            if (bulkBtn && countSpan) {
+                const count = selectedGuests.size;
+                countSpan.innerText = count;
+                if (count > 0) {
+                    bulkBtn.style.setProperty('display', 'inline-flex', 'important');
+                } else {
+                    bulkBtn.style.setProperty('display', 'none', 'important');
+                }
+            }
+
+            if (selectAllCb && tbody) {
+                const visibleCheckboxes = tbody.querySelectorAll('.admin-row-checkbox');
+                if (visibleCheckboxes.length > 0) {
+                    const allChecked = Array.from(visibleCheckboxes).every(cb => cb.checked);
+                    selectAllCb.checked = allChecked;
+                } else {
+                    selectAllCb.checked = false;
+                }
+            }
+        };
+
+        const loadInvites = async () => {
+            const tbody = document.getElementById('admin-table-body');
+            if (!tbody) return;
+            
+            // Try to load from IndexedDB first for instant display
+            const cachedInvites = await getCachedInvites();
+            if (cachedInvites && Array.isArray(cachedInvites)) {
+                allInvites = cachedInvites;
+                renderTable();
+            } else {
+                tbody.innerHTML = '<tr><td colspan="4" class="admin-td-empty">Cargando invitaciones...</td></tr>';
+            }
+            
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "get-invites" })
+                });
+                const resData = await response.json();
+                
+                if (resData.status === "success" && resData.invites) {
+                    allInvites = resData.invites;
+                    await saveCachedInvites(allInvites);
+                    renderTable();
+                } else {
+                    if (!cachedInvites) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="admin-td-empty" style="color:#ff5050;">Error al cargar invitaciones.</td></tr>';
+                    }
+                    showToast("Error al sincronizar con el servidor.", "error");
+                }
+            } catch (err) {
+                console.error("Error loading invites:", err);
+                if (!cachedInvites) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="admin-td-empty" style="color:#ff5050;">Fallo de conexión.</td></tr>';
+                }
+                showToast("Fallo de conexión con el servidor.", "error");
+            }
+        };
+
+        const renderTable = async () => {
+            const tbody = document.getElementById('admin-table-body');
+            if (!tbody) return;
+            
+            const searchInput = document.getElementById('admin-search');
+            const filterSelect = document.getElementById('admin-filter-status');
+            const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const filterValue = filterSelect ? filterSelect.value : 'todos';
+            
+            const filteredInvites = allInvites.filter(invite => {
+                const matchesSearch = invite.name.toLowerCase().includes(searchValue);
+                const matchesStatus = filterValue === 'todos' || invite.status === filterValue;
+                return matchesSearch && matchesStatus;
+            });
+            
+            const totalRecords = filteredInvites.length;
+            const totalPages = Math.ceil(totalRecords / recordsPerPage) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+            
+            const startIndex = (currentPage - 1) * recordsPerPage;
+            const endIndex = Math.min(startIndex + recordsPerPage, totalRecords);
+            const pageRecords = filteredInvites.slice(startIndex, endIndex);
+            
+            const paginationInfo = document.getElementById('admin-pagination-info');
+            if (paginationInfo) {
+                paginationInfo.innerText = totalRecords === 0
+                    ? "Mostrando 0 de 0"
+                    : `Mostrando ${startIndex + 1}–${endIndex} de ${totalRecords}`;
+            }
+            
+            const prevBtn = document.getElementById('admin-page-prev');
+            const nextBtn = document.getElementById('admin-page-next');
+            if (prevBtn) prevBtn.disabled = currentPage === 1;
+            if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+            
+            tbody.innerHTML = '';
+            if (pageRecords.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="admin-td-empty">No se encontraron invitaciones.</td></tr>';
+                updateStats();
+                return;
+            }
+            
+            for (const invite of pageRecords) {
+                const tr = document.createElement('tr');
+                
+                let statusStyle = '';
+                if (invite.status === 'Confirmado') {
+                    statusStyle = 'color:#4cd137;background:rgba(76,209,55,0.12);border:1px solid rgba(76,209,55,0.4);';
+                } else if (invite.status === 'Declinado') {
+                    statusStyle = 'color:#e84118;background:rgba(232,65,24,0.12);border:1px solid rgba(232,65,24,0.4);';
+                } else {
+                    statusStyle = 'color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);';
+                }
+                
+                const token = await encryptInvite({ name: invite.name, passes: parseInt(invite.max_passes, 10) });
+                const inviteUrl = window.location.origin + window.location.pathname + "?pass=" + token;
+                
+                const isChecked = selectedGuests.has(invite.name) ? 'checked' : '';
+                tr.innerHTML = `
+                    <td style="text-align: center; padding: 0.9rem 0.5rem;">
+                        <input type="checkbox" class="admin-row-checkbox" data-name="${invite.name}" ${isChecked} style="cursor: pointer; transform: scale(1.15);">
+                    </td>
+                    <td><strong style="color:#fff;">${invite.name}</strong></td>
+                    <td style="color:#bbb;font-size:0.88rem;">${invite.confirmed_passes} / ${invite.max_passes}</td>
+                    <td>
+                        <span class="admin-badge" style="${statusStyle}">${invite.status}</span>
+                    </td>
+                    <td style="text-align:center;">
+                        <div style="display:flex;gap:0.4rem;justify-content:center;align-items:center;">
+                            <button class="admin-action-btn admin-action-copy" title="Copiar enlace">📋</button>
+                            <button class="admin-action-btn admin-action-edit" title="Editar">✏️</button>
+                            <button class="admin-action-btn admin-action-delete" title="Eliminar">🗑️</button>
+                        </div>
+                    </td>
+                `;
+                
+                tr.querySelector('.admin-row-checkbox').addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedGuests.add(invite.name);
+                    } else {
+                        selectedGuests.delete(invite.name);
+                    }
+                    updateBulkShareButtonState();
+                });
+                
+                tr.querySelector('.admin-action-copy').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(inviteUrl).then(() => {
+                        showToast(`📋 Enlace copiado para ${invite.name}`);
+                    });
+                });
+                
+                tr.querySelector('.admin-action-edit').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openEditModal(invite);
+                });
+                
+                tr.querySelector('.admin-action-delete').addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    if (confirm(`¿Eliminar la invitación de "${invite.name}"?`)) {
+                        const backupInvites = [...allInvites];
+                        allInvites = allInvites.filter(i => i.name.toLowerCase() !== invite.name.toLowerCase());
+                        selectedGuests.delete(invite.name);
+                        await saveCachedInvites(allInvites);
+                        renderTable();
+                        
+                        try {
+                            const response = await fetch(BACKEND_URL, {
+                                method: 'POST',
+                                body: JSON.stringify({ action: "delete-invite", data: { name: invite.name } })
+                            });
+                            const res = await response.json();
+                            if (res.status === "success") {
+                                showToast(`🗑️ Invitación de ${invite.name} eliminada.`);
+                                loadInvites();
+                            } else {
+                                allInvites = backupInvites;
+                                await saveCachedInvites(allInvites);
+                                renderTable();
+                                showToast("Error al eliminar la invitación.", "error");
+                            }
+                        } catch (err) {
+                            console.error("Error deleting invite:", err);
+                            allInvites = backupInvites;
+                            await saveCachedInvites(allInvites);
+                            renderTable();
+                            showToast("Fallo de conexión al eliminar.", "error");
+                        }
+                    }
+                });
+                
+                tbody.appendChild(tr);
+            }
+            updateStats();
+            updateBulkShareButtonState();
+        };
+
+        const updateStats = () => {
+            const total = allInvites.length;
+            const confirmed = allInvites.filter(i => i.status === 'Confirmado').length;
+            const pending = allInvites.filter(i => i.status === 'Pendiente').length;
+            const declined = allInvites.filter(i => i.status === 'Declinado').length;
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+            set('stat-total', total);
+            set('stat-confirmed', confirmed);
+            set('stat-pending', pending);
+            set('stat-declined', declined);
+        };
+
+        const openEditModal = (invite) => {
+            if (!editModal) return;
+            editOldName.value = invite.name;
+            editGuestName.value = invite.name;
+            editPasses.value = invite.max_passes.toString();
+            editStatus.value = invite.status;
+            editConfirmedPasses.value = invite.confirmed_passes.toString();
+            editModal.classList.remove('hidden');
+        };
+
+        const closeEditModal = () => {
+            if (!editModal) return;
+            editModal.classList.add('hidden');
+        };
+
+        if (editCancelBtn) editCancelBtn.addEventListener('click', closeEditModal);
+        if (editModal) {
+            editModal.addEventListener('click', (e) => { if (e.target === editModal) closeEditModal(); });
+        }
+
+        if (editSaveBtn) {
+            editSaveBtn.addEventListener('click', async () => {
+                const oldName = editOldName.value;
+                const newName = editGuestName.value.trim();
+                const maxPasses = parseInt(editPasses.value, 10);
+                const status = editStatus.value;
+                const confirmedPasses = parseInt(editConfirmedPasses.value, 10);
+                
+                if (!newName) { showToast("El nombre no puede estar vacío.", "error"); return; }
+                
+                editSaveBtn.disabled = true;
+                editSaveBtn.innerText = "GUARDANDO...";
+                
+                const backupInvites = [...allInvites];
+                const wasSelected = selectedGuests.has(oldName);
+                selectedGuests.delete(oldName);
+                if (wasSelected) {
+                    selectedGuests.add(newName);
+                }
+                allInvites = allInvites.map(i => {
+                    if (i.name.toLowerCase() === oldName.toLowerCase()) {
+                        return {
+                            ...i,
+                            name: newName,
+                            max_passes: maxPasses,
+                            status: status,
+                            confirmed_passes: confirmedPasses,
+                            updated_at: new Date().toISOString()
+                        };
+                    }
+                    return i;
+                });
+                await saveCachedInvites(allInvites);
+                renderTable();
+                closeEditModal();
+                showToast(`✅ Cambios aplicados localmente.`);
+                
+                try {
+                    const response = await fetch(BACKEND_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: "update-invite",
+                            data: { oldName, newName, max_passes: maxPasses, status, confirmed_passes: confirmedPasses }
+                        })
+                    });
+                    const res = await response.json();
+                    if (res.status === "success") {
+                        showToast(`✅ Invitación de ${newName} sincronizada con éxito.`);
+                        loadInvites();
+                    } else {
+                        allInvites = backupInvites;
+                        await saveCachedInvites(allInvites);
+                        renderTable();
+                        showToast("Error al guardar cambios en el servidor.", "error");
+                    }
+                } catch (err) {
+                    console.error("Error saving edit:", err);
+                    allInvites = backupInvites;
+                    await saveCachedInvites(allInvites);
+                    renderTable();
+                    showToast("Fallo de conexión al guardar.", "error");
+                } finally {
+                    editSaveBtn.disabled = false;
+                    editSaveBtn.innerText = "GUARDAR CAMBIOS";
+                }
+            });
+        }
+
+        // Table controls
+        const searchInput = document.getElementById('admin-search');
+        const filterSelect = document.getElementById('admin-filter-status');
+        const prevBtn = document.getElementById('admin-page-prev');
+        const nextBtn = document.getElementById('admin-page-next');
+        const refreshBtn = document.getElementById('admin-refresh-btn');
+        const selectAllCheckbox = document.getElementById('admin-select-all');
+        const bulkBtn = document.getElementById('admin-bulk-share-btn');
+        
+        if (searchInput) searchInput.addEventListener('input', () => { currentPage = 1; renderTable(); });
+        if (filterSelect) filterSelect.addEventListener('change', () => { currentPage = 1; renderTable(); });
+        
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 1) { currentPage--; renderTable(); }
+            });
+        }
+        
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                const sv = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                const fv = filterSelect ? filterSelect.value : 'todos';
+                const count = allInvites.filter(i => i.name.toLowerCase().includes(sv) && (fv === 'todos' || i.status === fv)).length;
+                const totalPages = Math.ceil(count / recordsPerPage) || 1;
+                if (currentPage < totalPages) { currentPage++; renderTable(); }
+            });
+        }
+
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => { loadInvites(); showToast("Actualizando lista..."); });
+        }
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', (e) => {
+                const tbody = document.getElementById('admin-table-body');
+                if (!tbody) return;
+                const checkboxes = tbody.querySelectorAll('.admin-row-checkbox');
+                checkboxes.forEach(cb => {
+                    cb.checked = e.target.checked;
+                    const name = cb.getAttribute('data-name');
+                    if (name) {
+                        if (e.target.checked) {
+                            selectedGuests.add(name);
+                        } else {
+                            selectedGuests.delete(name);
+                        }
+                    }
+                });
+                updateBulkShareButtonState();
+            });
+        }
+
+        const shareModal = document.getElementById('share-modal');
+        const shareModalList = document.getElementById('share-modal-list');
+        const shareCloseBtn = document.getElementById('share-close-btn');
+
+        if (shareCloseBtn && shareModal) {
+            shareCloseBtn.addEventListener('click', () => {
+                shareModal.classList.add('hidden');
+            });
+            shareModal.addEventListener('click', (e) => {
+                if (e.target === shareModal) shareModal.classList.add('hidden');
+            });
+        }
+
+        if (bulkBtn) {
+            bulkBtn.addEventListener('click', async () => {
+                if (selectedGuests.size === 0) return;
+                
+                bulkBtn.disabled = true;
+                const originalText = bulkBtn.innerHTML;
+                bulkBtn.innerText = "CARGANDO...";
+                
+                const selectedInvites = allInvites.filter(i => selectedGuests.has(i.name));
+                
+                if (shareModalList) {
+                    shareModalList.innerHTML = '';
+                    
+                    for (const invite of selectedInvites) {
+                        const token = await encryptInvite({ name: invite.name, passes: parseInt(invite.max_passes, 10) });
+                        const inviteUrl = window.location.origin + window.location.pathname + "?pass=" + token;
+                        const messageText = `🎟️ *Invitación de ${invite.name}*\n${invite.max_passes === 1 ? 'Solo Yo (1 pase)' : `${invite.max_passes} pases`}\n\n👉 ${inviteUrl}`;
+                        
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'share-item';
+                        
+                        itemDiv.innerHTML = `
+                            <div class="share-item-info">
+                                <strong class="share-item-name">${invite.name}</strong>
+                                <span class="share-item-passes">${invite.max_passes} ${invite.max_passes === 1 ? 'pase' : 'pases'}</span>
+                            </div>
+                            <div class="share-item-actions">
+                                <button class="share-copy-btn" title="Copiar mensaje">📋 COPIAR</button>
+                                <button class="share-wa-btn" title="Enviar por WhatsApp">💬 ENVIAR</button>
+                            </div>
+                        `;
+                        
+                        // Copy handler
+                        itemDiv.querySelector('.share-copy-btn').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            navigator.clipboard.writeText(messageText).then(() => {
+                                showToast(`📋 Mensaje copiado para ${invite.name}`);
+                                itemDiv.classList.add('share-item-done');
+                            });
+                        });
+                        
+                        // WhatsApp handler
+                        itemDiv.querySelector('.share-wa-btn').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(messageText)}`;
+                            window.open(waUrl, '_blank');
+                            itemDiv.classList.add('share-item-done');
+                        });
+                        
+                        shareModalList.appendChild(itemDiv);
+                    }
+                }
+                
+                bulkBtn.disabled = false;
+                bulkBtn.innerHTML = originalText;
+                const countSpan = document.getElementById('admin-selected-count');
+                if (countSpan) countSpan.innerText = selectedGuests.size;
+                
+                if (shareModal) {
+                    shareModal.classList.remove('hidden');
+                }
+            });
+        }
+
+        const doLogin = () => {
+            const enteredPass = adminPassInput.value;
+            if (enteredPass === "admin123") {
+                adminLoginGroup.classList.add('hidden');
+                adminGeneratorGroup.classList.remove('hidden');
+                const statsGroup = document.getElementById('admin-stats-group');
+                if (statsGroup) statsGroup.classList.remove('hidden');
+                const tableContainer = document.getElementById('admin-table-container');
+                if (tableContainer) tableContainer.classList.remove('hidden');
+                
+                const adminBody = document.querySelector('.admin-body');
+                if (adminBody) adminBody.classList.add('admin-logged-in');
+                
+                loadInvites();
+                showToast("✅ Sesión iniciada correctamente.");
+            } else {
+                adminLoginError.classList.remove('hidden');
+                setTimeout(() => { adminLoginError.classList.add('hidden'); }, 3000);
+                showToast("Contraseña incorrecta.", "error");
+            }
+        };
+
+        if (adminLoginBtn) adminLoginBtn.addEventListener('click', doLogin);
+        if (adminPassInput) {
+            adminPassInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+        }
+
+        // Generate invitation handler
+        const generateBtn = document.getElementById('generate-invite-btn');
+        const guestNameInput = document.getElementById('invite-guest-name');
+        const passesSelect = document.getElementById('invite-passes');
+
+        if (generateBtn) {
+            generateBtn.addEventListener('click', async () => {
+                const guestName = guestNameInput.value.trim();
+                const passes = passesSelect.value;
+                if (!guestName) {
+                    showToast("Por favor ingresa el nombre del invitado.", "error");
+                    return;
+                }
+                
+                generateBtn.disabled = true;
+                generateBtn.innerText = "GENERANDO...";
+
+                const token = await encryptInvite({ name: guestName, passes: parseInt(passes, 10) });
+                if (token) {
+                    const cleanUrl = window.location.origin + window.location.pathname + "?pass=" + token;
+                    navigator.clipboard.writeText(cleanUrl).then(() => {
+                        showToast(`🎟️ Invitación para ${guestName} creada y copiada!`);
+                    }).catch(() => {
+                        showToast(`🎟️ Invitación para ${guestName} generada!`);
+                    });
+
+                    // Optimistic update
+                    const newInvite = {
+                        name: guestName,
+                        max_passes: parseInt(passes, 10),
+                        status: "Pendiente",
+                        confirmed_passes: 0,
+                        updated_at: new Date().toISOString()
+                    };
+                    
+                    allInvites = allInvites.filter(i => i.name.toLowerCase() !== guestName.toLowerCase());
+                    allInvites.unshift(newInvite);
+                    await saveCachedInvites(allInvites);
+                    renderTable();
+
+                    guestNameInput.value = '';
+                    
+                    try {
+                        const response = await fetch(BACKEND_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({ action: "create-invite", data: { name: guestName, max_passes: parseInt(passes, 10) } })
+                        });
+                        const res = await response.json();
+                        if (res.status !== "success") {
+                            showToast("Error al registrar en Google Sheets", "error");
+                        }
+                        loadInvites();
+                    } catch (err) {
+                        console.error("Error registering invite in Sheets:", err);
+                        showToast("Error de conexión al registrar en Google Sheets", "error");
+                    }
+                }
+                generateBtn.disabled = false;
+                generateBtn.innerText = "✨ GENERAR INVITACIÓN";
+            });
+        }
+    };
+
+    const checkInvitationAccess = async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const passToken = urlParams.get('pass');
+        const isAdmin = urlParams.get('admin') === 'true';
+
+        const landingOverlay = document.getElementById('landing-overlay');
+        const adminOverlay = document.getElementById('admin-overlay');
+
+        // If explicitly admin OR if there is no guest token, show the admin login screen by default
+        if (isAdmin || !passToken) {
+            if (landingOverlay) landingOverlay.classList.add('hidden');
+            if (adminOverlay) adminOverlay.classList.remove('hidden');
+            initAdminLogic();
+            return;
+        }
+
+        const guestData = await decryptInvite(passToken);
+        if (!guestData) {
+            showAccessDenied("El código de tu invitación VIP no es válido o ha expirado.");
+            return;
+        }
+
+        setupGuestInvitation(guestData);
+    };
+
+    // Run access control check immediately
+    checkInvitationAccess();
+
+    // --- Initialize Vanilla Tilt ---
+    if (typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+            max: 10,
+            speed: 600,
+            glare: true,
+            "max-glare": 0.25,
+            perspective: 1200
+        });
+    }
+
+    // --- Interactive Mouse Spotlight Tracker ---
+    const updateSpotlight = (e) => {
+        const target = e.currentTarget;
+        const rect = target.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        target.style.setProperty('--mouse-x', `${x}px`);
+        target.style.setProperty('--mouse-y', `${y}px`);
+    };
+
+    const registerSpotlights = () => {
+        const items = document.querySelectorAll('.glass-card-v3, .rsvp-card-v3, .timer-box, .t-item');
+        items.forEach(item => {
+            item.addEventListener('mousemove', updateSpotlight);
+        });
+    };
+    registerSpotlights();
+
+    // --- Dynamic Glare Tracker on VIP Pass Ticket ---
+    const initTicketGlare = () => {
+        const ticket = document.querySelector('.vip-pass-ticket');
+        if (ticket) {
+            ticket.addEventListener('mousemove', e => {
+                const rect = ticket.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                ticket.style.setProperty('--glare-x', `${x}px`);
+                ticket.style.setProperty('--glare-y', `${y}px`);
+            });
+        }
+    };
+
+    // --- GSAP Landing Intro Animation ---
+    if (typeof gsap !== 'undefined') {
+        const introTl = gsap.timeline();
+        introTl.set(".landing-frame", { scale: 1.05, opacity: 0 })
+            .set(".landing-roulette-bg", { scale: 0.5, opacity: 0 })
+            .set(".corner-decor", { opacity: 0 })
+            .set(".side-chip", { scale: 0, opacity: 0 })
+            .set(".envelope-wrapper", { scale: 0.9, y: 50, opacity: 0 });
+
+        introTl.to(".landing-frame", { duration: 1.2, scale: 1, opacity: 1, ease: "power4.out" })
+            .to(".landing-roulette-bg", { duration: 2, scale: 1, opacity: 0.04, ease: "power4.out" }, "-=0.8")
+            .to(".envelope-wrapper", { duration: 1.2, scale: 1, y: 0, opacity: 1, ease: "back.out(1.2)" }, "-=1.2")
+            .to(".side-chip", { duration: 1, scale: 1, opacity: 0.85, stagger: 0.1, ease: "back.out(1.5)" }, "-=0.8")
+            .to(".corner-decor", { duration: 0.8, opacity: 1, stagger: 0.08, ease: "power2.out" }, "-=0.4");
+    }
+
+    // --- Three.js 3D Background ---
+    let mouseX = 0, mouseY = 0;
+    window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX - window.innerWidth / 2) / 200;
+        mouseY = (e.clientY - window.innerHeight / 2) / 200;
+    });
+
+    const initThree = () => {
+        const canvas = document.querySelector('#bg-canvas');
+        if (!canvas || typeof THREE === 'undefined') return;
+
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas, 
+            antialias: false, 
+            alpha: true,
+            powerPreference: "high-performance",
+            precision: "mediump"
+        });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 6;
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        // Card suit particle textures
+        const suits = ['♠', '♥', '♣', '♦'];
+        const suitColors = ['rgba(212,175,55,0.9)', 'rgba(255,80,80,0.85)', 'rgba(212,175,55,0.9)', 'rgba(255,80,80,0.85)'];
+
+        const createSuitTexture = (suitIndex) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 64, 64);
+            ctx.font = 'bold 48px serif';
+            ctx.fillStyle = suitColors[suitIndex];
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = suitColors[suitIndex];
+            ctx.shadowBlur = 12;
+            ctx.fillText(suits[suitIndex], 32, 34);
+            return new THREE.CanvasTexture(canvas);
+        };
+
+        const particleTexture = createSuitTexture(0); // default spade texture
+
+        // Create 4 suit particle groups (spades gold, hearts red, clubs gold, diamonds red)
+        const suitParticleSystems = [];
+        [0, 1, 2, 3].forEach(suitIdx => {
+            const geo = new THREE.BufferGeometry();
+            const cnt = 80; // fewer, bigger symbols
+            const pos = new Float32Array(cnt * 3);
+            const vels = new Float32Array(cnt);
+            const sw = new Float32Array(cnt);
+            for (let i = 0; i < cnt * 3; i += 3) {
+                pos[i] = (Math.random() - 0.5) * 18;
+                pos[i + 1] = (Math.random() - 0.5) * 14;
+                pos[i + 2] = (Math.random() - 0.5) * 8 - 2;
+                vels[i / 3] = 0.002 + Math.random() * 0.004;
+                sw[i / 3] = Math.random() * 100;
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            const mat = new THREE.PointsMaterial({
+                size: 0.22,
+                map: createSuitTexture(suitIdx),
+                transparent: true,
+                opacity: 0.45,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+            const mesh = new THREE.Points(geo, mat);
+            scene.add(mesh);
+            suitParticleSystems.push({ mesh, geo, vels, sw, cnt });
+        });
+
+        // Load floating 3D chips in the background
+        const loader = new THREE.TextureLoader();
+        const chips = [];
+        loader.load('assets/chip.png', (texture) => {
+            const chipGeometry = new THREE.PlaneGeometry(1, 1);
+            const chipMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+
+            const chipCoords = [
+                { x: -4, y: 3, z: -2, rotSpeed: 0.01 },
+                { x: 4, y: -2, z: 1, rotSpeed: -0.008 },
+                { x: -2, y: -4, z: -3, rotSpeed: 0.012 }
+            ];
+
+            chipCoords.forEach(coords => {
+                const chipMesh = new THREE.Mesh(chipGeometry, chipMaterial);
+                chipMesh.position.set(coords.x, coords.y, coords.z);
+                chipMesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+                scene.add(chipMesh);
+                chips.push({ mesh: chipMesh, rotSpeed: coords.rotSpeed });
+            });
+        });
+
+        const animate = () => {
+            requestAnimationFrame(animate);
+
+            const t = Date.now() * 0.001;
+
+            suitParticleSystems.forEach((sys, sysIdx) => {
+                const positions = sys.geo.attributes.position.array;
+                for (let i = 0; i < sys.cnt; i++) {
+                    const idx = i * 3;
+                    positions[idx + 1] -= sys.vels[i];
+                    positions[idx] += Math.sin(t + sys.sw[i]) * 0.002;
+                    if (positions[idx + 1] < -7) {
+                        positions[idx + 1] = 7;
+                        positions[idx] = (Math.random() - 0.5) * 18;
+                    }
+                }
+                sys.geo.attributes.position.needsUpdate = true;
+                sys.mesh.rotation.z += 0.0003 * (sysIdx % 2 === 0 ? 1 : -1);
+            });
+
+            chips.forEach(chip => {
+                chip.mesh.rotation.x += chip.rotSpeed;
+                chip.mesh.rotation.y += chip.rotSpeed * 0.5;
+            });
+
+            camera.position.x += (mouseX - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        };
+
+        animate();
+
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    };
+
+    try {
+        initThree();
+    } catch (e) {
+        console.warn("Three.js background initialization failed:", e);
+    }
+
+    // --- UI Controls ---
+    const sealContainer = document.querySelector('.envelope-seal-container');
+    const envelope = document.querySelector('.envelope');
+    const openBtn = document.getElementById('open-btn');
+    const landingOverlay = document.getElementById('landing-overlay');
+    const mainContent = document.getElementById('main-content');
+    const musicControl = document.getElementById('music-control');
+    const musicIcon = document.getElementById('music-icon');
+    const audio = document.getElementById('bg-music');
+
+    // Envelope opening interaction & Site Reveal Transition
+    let transitionTriggered = false;
+    const triggerMainReveal = () => {
+        if (transitionTriggered) return;
+        transitionTriggered = true;
+
+        // Confetti explosion
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 200,
+                spread: 90,
+                origin: { y: 0.6 },
+                colors: ['#d4af37', '#ffffff', '#c40000', '#000000']
+            });
+        }
+
+        if (typeof gsap !== 'undefined') {
+            const tl = gsap.timeline();
+            mainContent.classList.remove('hidden');
+
+            // Fast snappy fade out / zoom out transition
+            tl.to(".envelope-wrapper", { duration: 0.3, scale: 0.9, opacity: 0, ease: "power2.in" })
+                .to([".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], { duration: 0.3, opacity: 0, ease: "power2.in" }, "-=0.3")
+                .to(landingOverlay, { duration: 0.8, y: "-100%", ease: "expo.inOut" }, "-=0.1")
+                .set(landingOverlay, { display: "none" })
+                .from(".hero-v3 .hero-text > *", { duration: 1.0, y: 50, opacity: 0, stagger: 0.1, ease: "power3.out" }, "-=0.4")
+                .from(".hero-frame", { duration: 1.2, scale: 0.95, opacity: 0, ease: "power3.out" }, "-=0.8")
+                .from(".floating-asset", { duration: 1.5, scale: 0, opacity: 0, stagger: 0.15, ease: "back.out(1.2)" }, "-=0.8");
+        } else {
+            mainContent.classList.remove('hidden');
+            landingOverlay.style.display = "none";
+        }
+
+        initCountdown();
+
+        // Reinitialize tilt after main reveals for new elements
+        if (typeof VanillaTilt !== 'undefined') {
+            VanillaTilt.init(document.querySelectorAll("[data-tilt]"), {
+                max: 10,
+                speed: 600,
+                glare: true,
+                "max-glare": 0.25,
+                perspective: 1200
+            });
+        }
+    };
+
+    if (envelope) {
+        envelope.addEventListener('click', (e) => {
+            if (document.querySelector('.envelope-instruction')) {
+                document.querySelector('.envelope-instruction').style.opacity = '0';
+            }
+
+            // Auto start audio music on envelope break
+            if (audio && musicIcon && musicControl) {
+                audio.play().then(() => {
+                    musicIcon.classList.add('rotating');
+                }).catch(() => { });
+                musicControl.classList.remove('hidden');
+            }
+
+            // Auto-transition to show the content instantly without opening animations
+            triggerMainReveal(); 
+        });
+    }
+
+    // Music control toggle click
+    if (musicControl && audio && musicIcon) {
+        musicControl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (audio.paused) {
+                audio.play();
+                musicIcon.classList.add('rotating');
+            } else {
+                audio.pause();
+                musicIcon.classList.remove('rotating');
+            }
+        });
+    }
+
+    // Entering the invitation from card button (can click immediately to skip delay)
+    if (openBtn) {
+        openBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            triggerMainReveal();
+        });
+    }
+
+    // --- Countdown ---
+    function initCountdown() {
+        const target = new Date("August 15, 2026 00:00:00").getTime();
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const diff = target - now;
+
+            const d = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+            const h = Math.max(0, Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
+            const m = Math.max(0, Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
+            const s = Math.max(0, Math.floor((diff % (1000 * 60)) / 1000));
+
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+
+            if (daysEl) daysEl.innerText = d.toString().padStart(2, '0');
+            if (hoursEl) hoursEl.innerText = h.toString().padStart(2, '0');
+            if (minutesEl) minutesEl.innerText = m.toString().padStart(2, '0');
+            if (secondsEl) secondsEl.innerText = s.toString().padStart(2, '0');
+
+            // Bar circles stroke-dashoffset (282.74 is 2 * PI * 45)
+            const maxOffset = 282.74;
+            const maxDaysVal = 90;
+
+            const dBar = document.getElementById('days-bar');
+            const hBar = document.getElementById('hours-bar');
+            const mBar = document.getElementById('minutes-bar');
+            const sBar = document.getElementById('seconds-bar');
+
+            if (dBar) dBar.style.strokeDashoffset = (maxOffset - Math.min(1, d / maxDaysVal) * maxOffset);
+            if (hBar) hBar.style.strokeDashoffset = (maxOffset - (h / 24) * maxOffset);
+            if (mBar) mBar.style.strokeDashoffset = (maxOffset - (m / 60) * maxOffset);
+            if (sBar) sBar.style.strokeDashoffset = (maxOffset - (s / 60) * maxOffset);
+
+            if (diff > 0) requestAnimationFrame(updateTimer);
+        };
+        updateTimer();
+    }
+
+    // --- GSAP ScrollTrigger reveals ---
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+
+        gsap.set(".reveal", { y: 50, opacity: 0 });
+
+        const reveals = gsap.utils.toArray('.reveal');
+        reveals.forEach(el => {
+            gsap.to(el, {
+                scrollTrigger: {
+                    trigger: el,
+                    start: "top 88%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
+    }
+
+    // --- Copy CLABE Code with Tooltip ---
+    const copyClabe = document.getElementById('copy-clabe');
+    const clabeVal = document.getElementById('clabe-val');
+    if (copyClabe && clabeVal) {
+        const tooltip = document.createElement('span');
+        tooltip.className = 'clabe-tooltip cinzel-font';
+        tooltip.innerText = '¡Copiado!';
+        copyClabe.appendChild(tooltip);
+
+        copyClabe.addEventListener('click', () => {
+            const textToCopy = clabeVal.innerText.replace(/\s+/g, '');
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                tooltip.classList.add('show');
+                setTimeout(() => tooltip.classList.remove('show'), 2000);
+            }).catch(err => {
+                console.error('Failed to copy CLABE: ', err);
+            });
+        });
+    }
+
+    // --- RSVP VIP Pass Generation ---
+    const rsvpForm = document.getElementById('rsvp-form');
+    const rsvpMessage = document.getElementById('rsvp-message');
+    const rsvpDeclineMessage = document.getElementById('rsvp-decline-message');
+    const declineBtn = document.getElementById('rsvp-decline-btn');
+
+    if (rsvpForm && rsvpMessage) {
+        rsvpForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const guestName = document.getElementById('rsvp-name').value.trim();
+            const guestSelect = document.getElementById('rsvp-guests');
+            const passText = guestSelect ? guestSelect.options[guestSelect.selectedIndex].text.toUpperCase() : "1 PASE";
+
+            const countEl = document.getElementById('pass-count-text');
+            if (countEl) countEl.innerText = "ACCESO AUTORIZADO: " + passText;
+
+            // Submit RSVP to Spreadsheet & trigger Telegram notification in background
+            const selectedPassCount = guestSelect ? parseInt(guestSelect.value, 10) + 1 : 1;
+            
+            // Save response in localStorage to remember on page reload
+            const urlParams = new URLSearchParams(window.location.search);
+            const passToken = urlParams.get('pass');
+            if (passToken) {
+                setStorageItem('rsvp_status_' + passToken, 'confirmed');
+                setStorageItem('rsvp_pass_text_' + passToken, passText);
+            }
+
+            fetch(BACKEND_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: "rsvp",
+                    data: {
+                        name: guestName,
+                        confirmed: true,
+                        passes: selectedPassCount
+                    }
+                })
+            }).catch(err => console.error("Error saving RSVP to Sheets:", err));
+
+            if (typeof gsap !== 'undefined') {
+                gsap.to(rsvpForm, {
+                    duration: 0.5, scale: 0.8, opacity: 0, onComplete: () => {
+                        rsvpForm.style.display = "none";
+                        rsvpMessage.style.display = "block";
+                        gsap.fromTo(rsvpMessage, {
+                            y: 30, opacity: 0
+                        }, {
+                            duration: 0.8, y: 0, opacity: 1, ease: "power3.out"
+                        });
+                    }
+                });
+            } else {
+                rsvpForm.style.display = "none";
+                rsvpMessage.style.display = "block";
+            }
+        });
+
+        if (declineBtn && rsvpDeclineMessage) {
+            declineBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const guestName = document.getElementById('rsvp-name').value.trim();
+
+                // Save response in localStorage to remember on page reload
+                const urlParams = new URLSearchParams(window.location.search);
+                const passToken = urlParams.get('pass');
+                if (passToken) {
+                    setStorageItem('rsvp_status_' + passToken, 'declined');
+                }
+
+                // Submit RSVP to Spreadsheet (confirmed: false, passes: 0)
+                fetch(BACKEND_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: "rsvp",
+                        data: {
+                            name: guestName,
+                            confirmed: false,
+                            passes: 0
+                        }
+                    })
+                }).catch(err => console.error("Error saving RSVP to Sheets:", err));
+
+                if (typeof gsap !== 'undefined') {
+                    gsap.to(rsvpForm, {
+                        duration: 0.5, scale: 0.8, opacity: 0, onComplete: () => {
+                            rsvpForm.style.display = "none";
+                            rsvpDeclineMessage.style.display = "block";
+                            gsap.fromTo(rsvpDeclineMessage, {
+                                y: 30, opacity: 0
+                            }, {
+                                duration: 0.8, y: 0, opacity: 1, ease: "power3.out"
+                            });
+                        }
+                    });
+                } else {
+                    rsvpForm.style.display = "none";
+                    rsvpDeclineMessage.style.display = "block";
+                }
+            });
+        }
+    }
+
+    // --- Gallery Lightbox ---
+    const galleryCards = document.querySelectorAll('.gallery-card');
+    const lightboxModal = document.getElementById('lightbox-modal');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+
+    let currentImgIndex = 0;
+    const galleryImages = Array.from(galleryCards).map(card => card.querySelector('.gallery-img').src);
+
+    if (galleryCards.length > 0 && lightboxModal && lightboxImg) {
+        const showImage = (index) => {
+            currentImgIndex = index;
+            lightboxImg.src = galleryImages[index];
+            lightboxModal.classList.add('show');
+        };
+
+        galleryCards.forEach((card, index) => {
+            card.addEventListener('click', () => {
+                showImage(index);
+            });
+        });
+
+        const closeLightbox = () => {
+            lightboxModal.classList.remove('show');
+        };
+
+        if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target === lightboxModal) closeLightbox();
+        });
+
+        if (lightboxPrev) {
+            lightboxPrev.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let nextIdx = currentImgIndex - 1;
+                if (nextIdx < 0) nextIdx = galleryImages.length - 1;
+                showImage(nextIdx);
+            });
+        }
+
+        if (lightboxNext) {
+            lightboxNext.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let nextIdx = currentImgIndex + 1;
+                if (nextIdx >= galleryImages.length) nextIdx = 0;
+                showImage(nextIdx);
+            });
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (!lightboxModal.classList.contains('show')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft' && lightboxPrev) lightboxPrev.click();
+            if (e.key === 'ArrowRight' && lightboxNext) lightboxNext.click();
+        });
+    }
+
+});
