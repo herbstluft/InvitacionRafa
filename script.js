@@ -789,10 +789,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // If no token is provided, load in preview/test mode
+        // If no token is provided, show access denied
         if (!passToken) {
-            const previewData = { name: "Invitado de Prueba", passes: 3 };
-            setupGuestInvitation(previewData);
+            showAccessDenied("Esta invitación es personal e intransferible. Por favor, solicita tu enlace de acceso VIP al anfitrión para ingresar al Casino Royale.");
             return;
         }
 
