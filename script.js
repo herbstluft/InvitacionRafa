@@ -779,19 +779,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const landingOverlay = document.getElementById('landing-overlay');
         const adminOverlay = document.getElementById('admin-overlay');
 
-        // If explicitly admin, show the admin login screen
-        if (isAdmin) {
+        // If explicitly admin or NO token is provided, show the admin login screen
+        if (isAdmin || !passToken) {
             document.documentElement.classList.remove('no-scroll');
             document.body.classList.remove('no-scroll');
             if (landingOverlay) landingOverlay.classList.add('hidden');
             if (adminOverlay) adminOverlay.classList.remove('hidden');
             initAdminLogic();
-            return;
-        }
-
-        // If no token is provided, show access denied
-        if (!passToken) {
-            showAccessDenied("Esta invitación es personal e intransferible. Por favor, solicita tu enlace de acceso VIP al anfitrión para ingresar al Casino Royale.");
             return;
         }
 
