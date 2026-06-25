@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="no-scroll">
 
 <head>
     <meta charset="UTF-8">
@@ -7,21 +7,23 @@
     <title>Casino Royale - Rafa's 15th Birthday Invitation</title>
     <meta name="description"
         content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa.">
-    
+
     <!-- Favicon / Chrome tab icon -->
     <link rel="icon" type="image/png" href="assets/chip.png">
 
     <!-- Open Graph / Link Preview (WhatsApp, Facebook) -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="♠️ Casino Royale ♣️ - Invitación VIP">
-    <meta property="og:description" content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa. 🎰">
+    <meta property="og:description"
+        content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa. 🎰">
     <meta property="og:image" content="https://cumpleanosrafa.netlify.app/assets/logo.png">
     <meta property="og:url" content="https://cumpleanosrafa.netlify.app/">
 
     <!-- Twitter Link Preview -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="♠️ Casino Royale ♣️ - Invitación VIP">
-    <meta name="twitter:description" content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa. 🎰">
+    <meta name="twitter:description"
+        content="Estás oficialmente invitado a la noche de casino más exclusiva del año. Celebremos el 15 cumpleaños de Rafa. 🎰">
     <meta name="twitter:image" content="https://cumpleanosrafa.netlify.app/assets/logo.png">
 
     <!-- Google Fonts -->
@@ -32,10 +34,10 @@
         rel="stylesheet">
 
     <!-- Local Stylesheet -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=29">
 </head>
 
-<body>
+<body class="no-scroll">
 
 
 
@@ -234,6 +236,10 @@
                             <p class="card-quote">"La vida es un juego, el destino da las cartas, tú decides qué hacer
                                 con ellas."</p>
 
+                            <!-- Portrait Image -->
+                            <img src="assets/1.jpeg" alt="Rafa"
+                                style="width: 90px; height: 90px; object-fit: cover; border-radius: 50%; border: 2px solid var(--gold); margin: 0.5rem 0; box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);">
+
                             <!-- Rafa Name -->
                             <h1 class="card-rafa-title">Rafa</h1>
 
@@ -341,7 +347,10 @@
                     <div class="admin-table-header">
                         <h3 class="admin-card-title" style="margin-bottom:0;">📋 INVITACIONES GENERADAS</h3>
                         <div style="display: flex; gap: 0.6rem; align-items: center;">
-                            <button id="admin-bulk-share-btn" class="admin-btn-primary" dir="ltr" style="display: none; font-size: 0.78rem; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-color: rgba(37,211,102,0.4);" title="Compartir seleccionados">📋 COMPARTIR SELECCIONADOS (<span id="admin-selected-count">0</span>)</button>
+                            <button id="admin-bulk-share-btn" class="admin-btn-primary" dir="ltr"
+                                style="display: none; font-size: 0.78rem; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-color: rgba(37,211,102,0.4);"
+                                title="Compartir seleccionados">📋 COMPARTIR SELECCIONADOS (<span
+                                    id="admin-selected-count">0</span>)</button>
                             <button id="admin-refresh-btn" class="admin-btn-icon" title="Recargar">↻</button>
                         </div>
                     </div>
@@ -350,7 +359,8 @@
                     <div class="admin-filters">
                         <div class="admin-search-wrap">
                             <span class="admin-search-icon">🔍</span>
-                            <input type="text" id="admin-search" class="admin-input admin-search-input" placeholder="Buscar por nombre...">
+                            <input type="text" id="admin-search" class="admin-input admin-search-input"
+                                placeholder="Buscar por nombre...">
                         </div>
                         <select id="admin-filter-status" class="admin-input admin-select admin-filter-select">
                             <option value="todos">Todos los Estados</option>
@@ -366,7 +376,8 @@
                             <thead>
                                 <tr>
                                     <th style="width: 40px; text-align: center; padding: 0.9rem 0.5rem;">
-                                        <input type="checkbox" id="admin-select-all" style="cursor: pointer; transform: scale(1.15);">
+                                        <input type="checkbox" id="admin-select-all"
+                                            style="cursor: pointer; transform: scale(1.15);">
                                     </th>
                                     <th>INVITADO</th>
                                     <th>PASES</th>
@@ -387,7 +398,8 @@
                         <span id="admin-pagination-info" class="admin-page-info">Mostrando 0 de 0</span>
                         <div class="admin-page-btns">
                             <button id="admin-page-prev" class="admin-btn-page">‹ Anterior</button>
-                            <button id="admin-page-next" class="admin-btn-page admin-btn-page-active">Siguiente ›</button>
+                            <button id="admin-page-next" class="admin-btn-page admin-btn-page-active">Siguiente
+                                ›</button>
                         </div>
                     </div>
                 </div>
@@ -467,13 +479,15 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Share/Reenvío Invitation Modal -->
     <div id="share-modal" class="admin-modal-overlay hidden">
         <div class="admin-modal-box" style="max-width: 600px; width: 95%;">
             <h3 class="admin-card-title" style="text-align:center; margin-bottom:1.5rem;">📋 REENVIAR INVITACIONES</h3>
-            <p style="font-size:0.85rem; color:#bbb; text-align:center; margin-bottom:1.5rem; line-height: 1.5; font-family: 'Montserrat', sans-serif;">
-                Haz clic en el botón de WhatsApp o Copiar de cada invitado para enviarlos uno por uno como mensajes separados.
+            <p
+                style="font-size:0.85rem; color:#bbb; text-align:center; margin-bottom:1.5rem; line-height: 1.5; font-family: 'Montserrat', sans-serif;">
+                Haz clic en el botón de WhatsApp o Copiar de cada invitado para enviarlos uno por uno como mensajes
+                separados.
             </p>
             <div id="share-modal-list">
                 <!-- Dynamically filled with selected invites -->
@@ -488,11 +502,15 @@
     <main id="main-content" class="hidden">
 
         <!-- Hero Section -->
-        <section class="section hero-v3">
+        <section class="section hero-section">
             <img src="assets/chip.png" alt="Chip Casino de Oro" class="floating-asset chip-1">
             <img src="assets/chip.png" alt="Chip Casino" class="floating-asset chip-2">
             <img src="assets/roulette.png" alt="Ruleta de Casino" class="floating-asset roulette-hero">
-
+ 
+            <!-- Floating Playing Cards -->
+            <div class="floating-card hero-card-1">A♠</div>
+            <div class="floating-card hero-card-2">A♥</div>
+ 
             <!-- Floating suit watermarks -->
             <div class="suit-watermark suit-wm-1">♠</div>
             <div class="suit-watermark suit-wm-2">♥</div>
@@ -502,18 +520,15 @@
             <div class="hero-text">
                 <p class="welcome-text">ESTÁS INVITADO A CELEBRAR</p>
                 <h1 class="rafa-name">Rafa</h1>
-                <h2 class="hero-years cinzel-font">15 AÑOS</h2>
-                <div class="hero-event-info cinzel-font">
-                    <span class="hero-info-item">♠ 15 AGO 2026</span>
-                    <span class="hero-info-sep">•</span>
-                    <span class="hero-info-item">8:30 PM</span>
-                    <span class="hero-info-sep">•</span>
-                    <span class="hero-info-item">CASUAL ♠</span>
+                <h2 class="hero-years cinzel-font" id="typewriter-years">MIS 15 AÑOS</h2>
+                <div class="hero-event-info cinzel-font" id="typewriter-info"
+                    style="display: flex; justify-content: center; align-items: center; min-height: 40px; color: var(--gold); font-size: 1.15rem; font-weight: bold; letter-spacing: 2px;">
+                    ♠ 15 AGO 2026 • 8:30 PM • CASUAL ♠
                 </div>
             </div>
 
             <div class="hero-frame">
-                <img src="assets/photo1.png" alt="Rafa Retrato" class="main-portrait">
+                <img src="assets/1.jpeg" alt="Rafa Retrato" class="main-portrait">
             </div>
         </section>
 
@@ -523,6 +538,26 @@
                 <div class="symbol">♣ ♦ ♠ ♥</div>
                 <p class="quote-text cinzel-font">"Hagan sus apuestas y prepárense para una noche que jamás olvidarán.
                     La suerte está echada — y la tuya ya llegó."</p>
+            </div>
+        </section>
+
+        <!-- Parents Section -->
+        <section class="section">
+            <div class="glass-card-v3 reveal felt-card"
+                style="max-width: 750px; width: 100%; border: 1px solid var(--glass-border);">
+                <h2 class="cinzel-font section-neon"
+                    style="margin-bottom: 2rem; font-size: 1.6rem; letter-spacing: 2px;">CON LA BENDICIÓN DE MIS PADRES
+                </h2>
+                <div
+                    style="display: flex; flex-direction: column; gap: 1rem; align-items: center; font-size: 1.25rem; font-family: 'Cinzel', serif; letter-spacing: 2px; text-transform: uppercase;">
+                    <span
+                        style="color: var(--gold); font-weight: bold; text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);">Maday
+                        Andrea Macías Amador</span>
+                    <span style="opacity: 0.5; font-size: 0.9rem;">&</span>
+                    <span
+                        style="color: var(--gold); font-weight: bold; text-shadow: 0 0 5px rgba(212, 175, 55, 0.3);">Alberto
+                        Carlos Sánchez Hernández</span>
+                </div>
             </div>
         </section>
 
@@ -585,9 +620,9 @@
                         <div class="t-icon">🎟️</div>
                         <div class="t-info">
                             <span class="t-time">08:30 PM</span>
-                            <span class="t-name">Alfombra Roja & Recepción</span>
-                            <p class="t-desc">Bienvenida en Quinta Jardín San Marcos con alfombra roja, sesión
-                                fotográfica VIP y bebida de cortesía.</p>
+                            <span class="t-name">Recepción</span>
+                            <p class="t-desc">Bienvenida oficial y recepción de invitados para dar inicio a la gran
+                                noche.</p>
                         </div>
                     </div>
                 </div>
@@ -595,12 +630,11 @@
                 <div class="timeline-item reveal">
                     <div class="timeline-dot">♦</div>
                     <div class="timeline-content t-item">
-                        <div class="t-icon">🎲</div>
+                        <div class="t-icon">✨</div>
                         <div class="t-info">
-                            <span class="t-time">09:00 PM</span>
-                            <span class="t-name">Apertura de Mesas</span>
-                            <p class="t-desc">Haz tus apuestas en Blackjack, Ruleta y Póker con tus fichas
-                                personalizadas de regalo.</p>
+                            <span class="t-time">09:30 PM</span>
+                            <span class="t-name">Vals del Festejado</span>
+                            <p class="t-desc">El momento más emotivo y tradicional de la gala de Rafa.</p>
                         </div>
                     </div>
                 </div>
@@ -611,9 +645,9 @@
                         <div class="t-icon">🍽️</div>
                         <div class="t-info">
                             <span class="t-time">10:00 PM</span>
-                            <span class="t-name">Cena de Gala</span>
-                            <p class="t-desc">Banquete especial para celebrar esta noche única y llenar la velada de
-                                sabor.</p>
+                            <span class="t-name">Cena y Brindis</span>
+                            <p class="t-desc">Disfrutamos de un banquete de gala y brindamos por los 15 años de Rafa.
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -621,25 +655,11 @@
                 <div class="timeline-item reveal">
                     <div class="timeline-dot">♥</div>
                     <div class="timeline-content t-item">
-                        <div class="t-icon">🥂</div>
+                        <div class="t-icon">💃</div>
                         <div class="t-info">
-                            <span class="t-time">11:00 PM</span>
-                            <span class="t-name">Brindis Real & Pastel</span>
-                            <p class="t-desc">Celebramos oficialmente los 15 años de Rafa con brindis de champaña y el
-                                pastel especial.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="timeline-item reveal">
-                    <div class="timeline-dot">♣</div>
-                    <div class="timeline-content t-item">
-                        <div class="t-icon">🎰</div>
-                        <div class="t-info">
-                            <span class="t-time">12:00 AM</span>
-                            <span class="t-name">After Party & DJ</span>
-                            <p class="t-desc">Se abre la pista de baile. El DJ oficial nos mantendrá bailando hasta el
-                                amanecer.</p>
+                            <span class="t-time">11:00 PM - 02:00 AM</span>
+                            <span class="t-name">Baile de Gala</span>
+                            <p class="t-desc">Se abre la pista. Música, baile y celebración hasta las 2:00 AM.</p>
                         </div>
                     </div>
                 </div>
@@ -670,14 +690,15 @@
             <div class="glass-card-v3 reveal misa-card" style="max-width: 750px; width: 100%;">
                 <p class="cinzel-font"
                     style="font-size: 1.5rem; color: var(--gold); margin-bottom: 1rem; font-weight: bold; letter-spacing: 2px;">
-                    SAN MARCOS</p>
-                <p style="font-size: 1.1rem; line-height: 1.8; font-weight: 300; letter-spacing: 1px; opacity: 0.85; margin-bottom: 1.5rem;">
+                    SAN JUDAS TADEO</p>
+                <p
+                    style="font-size: 1.1rem; line-height: 1.8; font-weight: 300; letter-spacing: 1px; opacity: 0.85; margin-bottom: 1.5rem;">
                     Te invitamos a acompañarnos a la ceremonia religiosa el<br>
-                    Sábado, 15 de Agosto de 2026 a las <strong style="color: var(--gold);">7:00 PM</strong>.<br>
-                    Dirección: <strong>Escobedo 3327, San Marcos</strong>
+                    Sábado, 15 de Agosto de 2026 a las <strong style="color: var(--gold);">6:00 PM</strong>.<br>
+                    Dirección: <strong>Torre de Cristo 333, Residencial Las Torres Sector 2</strong>
                 </p>
                 <button class="gold-btn-v3"
-                    onclick="window.open('https://maps.google.com/?q=Escobedo+3327,+San+Marcos', '_blank')"
+                    onclick="window.open('https://maps.google.com/?q=San+Judas+Tadeo+Torre+de+Cristo+333+Residencial+Las+Torres+Sector+2', '_blank')"
                     style="padding: 1.2rem 2.8rem; font-size: 0.95rem; font-weight: 700;">VER EN GOOGLE MAPS</button>
                 <div class="suits-divider" style="margin-top: 2.5rem;">♠ ♥ ♣ ♦</div>
             </div>
@@ -713,19 +734,19 @@
                 Momentos de Leyenda</p>
             <div class="gallery-grid reveal">
                 <div class="gallery-card">
-                    <img src="assets/photo2.png" alt="Rafa 2" class="gallery-img">
+                    <img src="assets/1.jpeg" alt="Rafa 1" class="gallery-img">
                     <div class="gallery-overlay-glow"></div>
                 </div>
                 <div class="gallery-card">
-                    <img src="assets/photo3.png" alt="Rafa 3" class="gallery-img">
+                    <img src="assets/2.jpeg" alt="Rafa 2" class="gallery-img">
                     <div class="gallery-overlay-glow"></div>
                 </div>
                 <div class="gallery-card">
-                    <img src="assets/photo4.png" alt="Rafa 4" class="gallery-img">
+                    <img src="assets/3.jpeg" alt="Rafa 3" class="gallery-img">
                     <div class="gallery-overlay-glow"></div>
                 </div>
                 <div class="gallery-card">
-                    <img src="assets/photo5.png" alt="Rafa 5" class="gallery-img">
+                    <img src="assets/4.jpeg" alt="Rafa 4" class="gallery-img">
                     <div class="gallery-overlay-glow"></div>
                 </div>
             </div>
@@ -789,23 +810,34 @@
                         </select>
                     </div>
                     <div class="rsvp-buttons-container">
-                        <button type="submit" id="rsvp-confirm-btn" class="gold-btn-v3 submit-btn-v3">CONFIRMAR ASISTENCIA</button>
+                        <button type="submit" id="rsvp-confirm-btn" class="gold-btn-v3 submit-btn-v3">CONFIRMAR
+                            ASISTENCIA</button>
                         <button type="button" id="rsvp-decline-btn" class="decline-btn-v3">NO ASISTIRÉ</button>
                     </div>
                 </form>
 
                 <!-- Success pass (simple elegant confirmation box) -->
-                <div id="rsvp-message" style="display: none; text-align: center; padding: 2.5rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
-                    <h3 class="cinzel-font" style="color: var(--gold); font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: 2px;">¡ASISTENCIA CONFIRMADA!</h3>
-                    <p style="font-weight: 300; line-height: 1.6; color: #eee; font-size: 1.1rem; letter-spacing: 0.5px; margin-bottom: 1rem;">
+                <div id="rsvp-message"
+                    style="display: none; text-align: center; padding: 2.5rem; background: rgba(212, 175, 55, 0.05); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+                    <h3 class="cinzel-font"
+                        style="color: var(--gold); font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: 2px;">
+                        ¡ASISTENCIA CONFIRMADA!</h3>
+                    <p
+                        style="font-weight: 300; line-height: 1.6; color: #eee; font-size: 1.1rem; letter-spacing: 0.5px; margin-bottom: 1rem;">
                         Tu respuesta ha sido registrada. ¡Gracias por confirmar!
                     </p>
-                    <p id="pass-count-text" style="font-weight: 400; color: var(--gold); font-size: 1.2rem; letter-spacing: 1px;"></p>
+                    <p id="pass-count-text"
+                        style="font-weight: 400; color: var(--gold); font-size: 1.2rem; letter-spacing: 1px;"></p>
                 </div>
                 <!-- Decline RSVP message -->
-                <div id="rsvp-decline-message" style="display: none; text-align: center; padding: 2.5rem; background: rgba(176, 21, 37, 0.08); border: 1px solid rgba(176, 21, 37, 0.4); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
-                    <h3 class="cinzel-font" style="color: var(--crimson-light); font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: 2px;">RESPUESTA REGISTRADA</h3>
-                    <p style="font-weight: 300; line-height: 1.6; color: #eee; font-size: 1.1rem; letter-spacing: 0.5px;">Lamentamos que no puedas asistir. ¡Gracias por informarnos!</p>
+                <div id="rsvp-decline-message"
+                    style="display: none; text-align: center; padding: 2.5rem; background: rgba(176, 21, 37, 0.08); border: 1px solid rgba(176, 21, 37, 0.4); border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+                    <h3 class="cinzel-font"
+                        style="color: var(--crimson-light); font-size: 1.8rem; margin-bottom: 1rem; letter-spacing: 2px;">
+                        RESPUESTA REGISTRADA</h3>
+                    <p
+                        style="font-weight: 300; line-height: 1.6; color: #eee; font-size: 1.1rem; letter-spacing: 0.5px;">
+                        Lamentamos que no puedas asistir. ¡Gracias por informarnos!</p>
                 </div>
             </div>
         </section>
@@ -851,10 +883,12 @@
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toast-container" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 100000; display: flex; flex-direction: column; gap: 0.8rem; pointer-events: none;"></div>
+    <div id="toast-container"
+        style="position: fixed; bottom: 2rem; right: 2rem; z-index: 100000; display: flex; flex-direction: column; gap: 0.8rem; pointer-events: none;">
+    </div>
 
     <!-- App Script -->
-    <script src="script.js?v=5"></script>
+    <script src="script.js?v=31"></script>
 </body>
 
 </html>

@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Cryptography Helpers for Invitation Locking ---
     const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzMrIRo-1w32iPpm64JhNgU4xCFYrmVzsKfUozAZ-tKbbkIW5OrxylvK7Map3sLtbMmMg/exec";
     const SECRET_PASSPHRASE = "Rafa30CasinoRoyale2026!"; // Secret key for AES-CBC
-    
+
     const str2ab = (str) => new TextEncoder().encode(str);
     const ab2str = (buf) => new TextDecoder().decode(buf);
 
@@ -88,11 +88,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Access Control / Routing Views ---
     const showAccessDenied = (msg) => {
+        document.documentElement.classList.remove('no-scroll');
+        document.body.classList.remove('no-scroll');
         const landingOverlay = document.getElementById('landing-overlay');
         const deniedOverlay = document.getElementById('denied-overlay');
         const deniedMessage = document.getElementById('denied-message');
         const mainContent = document.getElementById('main-content');
-        
+
         if (landingOverlay) landingOverlay.classList.add('hidden');
         if (mainContent) mainContent.classList.add('hidden');
         if (deniedOverlay) deniedOverlay.classList.remove('hidden');
@@ -112,10 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Check if already responded
         if (rsvpStatus && rsvpForm) {
-            // Skip landing overlay
-            if (landingOverlay) landingOverlay.style.display = 'none';
-            if (mainContent) mainContent.classList.remove('hidden');
-
+            triggerMainReveal(true);
             rsvpForm.style.display = 'none';
 
             if (rsvpStatus === 'confirmed') {
@@ -254,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const countSpan = document.getElementById('admin-selected-count');
             const selectAllCb = document.getElementById('admin-select-all');
             const tbody = document.getElementById('admin-table-body');
-            
+
             if (bulkBtn && countSpan) {
                 const count = selectedGuests.size;
                 countSpan.innerText = count;
@@ -279,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const loadInvites = async () => {
             const tbody = document.getElementById('admin-table-body');
             if (!tbody) return;
-            
+
             // Try to load from IndexedDB first for instant display
             const cachedInvites = await getCachedInvites();
             if (cachedInvites && Array.isArray(cachedInvites)) {
@@ -288,14 +287,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 tbody.innerHTML = '<tr><td colspan="4" class="admin-td-empty">Cargando invitaciones...</td></tr>';
             }
-            
+
             try {
                 const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: "get-invites" })
                 });
                 const resData = await response.json();
-                
+
                 if (resData.status === "success" && resData.invites) {
                     allInvites = resData.invites;
                     await saveCachedInvites(allInvites);
@@ -318,49 +317,49 @@ document.addEventListener('DOMContentLoaded', () => {
         const renderTable = async () => {
             const tbody = document.getElementById('admin-table-body');
             if (!tbody) return;
-            
+
             const searchInput = document.getElementById('admin-search');
             const filterSelect = document.getElementById('admin-filter-status');
             const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : '';
             const filterValue = filterSelect ? filterSelect.value : 'todos';
-            
+
             const filteredInvites = allInvites.filter(invite => {
                 const matchesSearch = invite.name.toLowerCase().includes(searchValue);
                 const matchesStatus = filterValue === 'todos' || invite.status === filterValue;
                 return matchesSearch && matchesStatus;
             });
-            
+
             const totalRecords = filteredInvites.length;
             const totalPages = Math.ceil(totalRecords / recordsPerPage) || 1;
             if (currentPage > totalPages) currentPage = totalPages;
             if (currentPage < 1) currentPage = 1;
-            
+
             const startIndex = (currentPage - 1) * recordsPerPage;
             const endIndex = Math.min(startIndex + recordsPerPage, totalRecords);
             const pageRecords = filteredInvites.slice(startIndex, endIndex);
-            
+
             const paginationInfo = document.getElementById('admin-pagination-info');
             if (paginationInfo) {
                 paginationInfo.innerText = totalRecords === 0
                     ? "Mostrando 0 de 0"
                     : `Mostrando ${startIndex + 1}–${endIndex} de ${totalRecords}`;
             }
-            
+
             const prevBtn = document.getElementById('admin-page-prev');
             const nextBtn = document.getElementById('admin-page-next');
             if (prevBtn) prevBtn.disabled = currentPage === 1;
             if (nextBtn) nextBtn.disabled = currentPage === totalPages;
-            
+
             tbody.innerHTML = '';
             if (pageRecords.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="admin-td-empty">No se encontraron invitaciones.</td></tr>';
                 updateStats();
                 return;
             }
-            
+
             for (const invite of pageRecords) {
                 const tr = document.createElement('tr');
-                
+
                 let statusStyle = '';
                 if (invite.status === 'Confirmado') {
                     statusStyle = 'color:#4cd137;background:rgba(76,209,55,0.12);border:1px solid rgba(76,209,55,0.4);';
@@ -369,10 +368,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     statusStyle = 'color:#ffd700;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);';
                 }
-                
+
                 const token = await encryptInvite({ name: invite.name, passes: parseInt(invite.max_passes, 10) });
                 const inviteUrl = window.location.origin + window.location.pathname + "?pass=" + token;
-                
+
                 const isChecked = selectedGuests.has(invite.name) ? 'checked' : '';
                 tr.innerHTML = `
                     <td style="text-align: center; padding: 0.9rem 0.5rem;">
@@ -391,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </td>
                 `;
-                
+
                 tr.querySelector('.admin-row-checkbox').addEventListener('change', (e) => {
                     if (e.target.checked) {
                         selectedGuests.add(invite.name);
@@ -400,19 +399,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     updateBulkShareButtonState();
                 });
-                
+
                 tr.querySelector('.admin-action-copy').addEventListener('click', (e) => {
                     e.stopPropagation();
                     navigator.clipboard.writeText(inviteUrl).then(() => {
                         showToast(`📋 Enlace copiado para ${invite.name}`);
                     });
                 });
-                
+
                 tr.querySelector('.admin-action-edit').addEventListener('click', (e) => {
                     e.stopPropagation();
                     openEditModal(invite);
                 });
-                
+
                 tr.querySelector('.admin-action-delete').addEventListener('click', async (e) => {
                     e.stopPropagation();
                     if (confirm(`¿Eliminar la invitación de "${invite.name}"?`)) {
@@ -421,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         selectedGuests.delete(invite.name);
                         await saveCachedInvites(allInvites);
                         renderTable();
-                        
+
                         try {
                             const response = await fetch(BACKEND_URL, {
                                 method: 'POST',
@@ -446,7 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
                 });
-                
+
                 tbody.appendChild(tr);
             }
             updateStats();
@@ -492,12 +491,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const maxPasses = parseInt(editPasses.value, 10);
                 const status = editStatus.value;
                 const confirmedPasses = parseInt(editConfirmedPasses.value, 10);
-                
+
                 if (!newName) { showToast("El nombre no puede estar vacío.", "error"); return; }
-                
+
                 editSaveBtn.disabled = true;
                 editSaveBtn.innerText = "GUARDANDO...";
-                
+
                 const backupInvites = [...allInvites];
                 const wasSelected = selectedGuests.has(oldName);
                 selectedGuests.delete(oldName);
@@ -521,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderTable();
                 closeEditModal();
                 showToast(`✅ Cambios aplicados localmente.`);
-                
+
                 try {
                     const response = await fetch(BACKEND_URL, {
                         method: 'POST',
@@ -561,16 +560,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const refreshBtn = document.getElementById('admin-refresh-btn');
         const selectAllCheckbox = document.getElementById('admin-select-all');
         const bulkBtn = document.getElementById('admin-bulk-share-btn');
-        
+
         if (searchInput) searchInput.addEventListener('input', () => { currentPage = 1; renderTable(); });
         if (filterSelect) filterSelect.addEventListener('change', () => { currentPage = 1; renderTable(); });
-        
+
         if (prevBtn) {
             prevBtn.addEventListener('click', () => {
                 if (currentPage > 1) { currentPage--; renderTable(); }
             });
         }
-        
+
         if (nextBtn) {
             nextBtn.addEventListener('click', () => {
                 const sv = searchInput ? searchInput.value.toLowerCase().trim() : '';
@@ -621,24 +620,24 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bulkBtn) {
             bulkBtn.addEventListener('click', async () => {
                 if (selectedGuests.size === 0) return;
-                
+
                 bulkBtn.disabled = true;
                 const originalText = bulkBtn.innerHTML;
                 bulkBtn.innerText = "CARGANDO...";
-                
+
                 const selectedInvites = allInvites.filter(i => selectedGuests.has(i.name));
-                
+
                 if (shareModalList) {
                     shareModalList.innerHTML = '';
-                    
+
                     for (const invite of selectedInvites) {
                         const token = await encryptInvite({ name: invite.name, passes: parseInt(invite.max_passes, 10) });
                         const inviteUrl = window.location.origin + window.location.pathname + "?pass=" + token;
                         const messageText = `🎟️ *Invitación de ${invite.name}*\n${invite.max_passes === 1 ? 'Solo Yo (1 pase)' : `${invite.max_passes} pases`}\n\n👉 ${inviteUrl}`;
-                        
+
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'share-item';
-                        
+
                         itemDiv.innerHTML = `
                             <div class="share-item-info">
                                 <strong class="share-item-name">${invite.name}</strong>
@@ -649,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <button class="share-wa-btn" title="Enviar por WhatsApp">💬 ENVIAR</button>
                             </div>
                         `;
-                        
+
                         // Copy handler
                         itemDiv.querySelector('.share-copy-btn').addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -658,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 itemDiv.classList.add('share-item-done');
                             });
                         });
-                        
+
                         // WhatsApp handler
                         itemDiv.querySelector('.share-wa-btn').addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -666,16 +665,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             window.open(waUrl, '_blank');
                             itemDiv.classList.add('share-item-done');
                         });
-                        
+
                         shareModalList.appendChild(itemDiv);
                     }
                 }
-                
+
                 bulkBtn.disabled = false;
                 bulkBtn.innerHTML = originalText;
                 const countSpan = document.getElementById('admin-selected-count');
                 if (countSpan) countSpan.innerText = selectedGuests.size;
-                
+
                 if (shareModal) {
                     shareModal.classList.remove('hidden');
                 }
@@ -691,10 +690,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (statsGroup) statsGroup.classList.remove('hidden');
                 const tableContainer = document.getElementById('admin-table-container');
                 if (tableContainer) tableContainer.classList.remove('hidden');
-                
+
                 const adminBody = document.querySelector('.admin-body');
                 if (adminBody) adminBody.classList.add('admin-logged-in');
-                
+
                 loadInvites();
                 showToast("✅ Sesión iniciada correctamente.");
             } else {
@@ -722,7 +721,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showToast("Por favor ingresa el nombre del invitado.", "error");
                     return;
                 }
-                
+
                 generateBtn.disabled = true;
                 generateBtn.innerText = "GENERANDO...";
 
@@ -743,14 +742,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         confirmed_passes: 0,
                         updated_at: new Date().toISOString()
                     };
-                    
+
                     allInvites = allInvites.filter(i => i.name.toLowerCase() !== guestName.toLowerCase());
                     allInvites.unshift(newInvite);
                     await saveCachedInvites(allInvites);
                     renderTable();
 
                     guestNameInput.value = '';
-                    
+
                     try {
                         const response = await fetch(BACKEND_URL, {
                             method: 'POST',
@@ -780,11 +779,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const landingOverlay = document.getElementById('landing-overlay');
         const adminOverlay = document.getElementById('admin-overlay');
 
-        // If explicitly admin OR if there is no guest token, show the admin login screen by default
-        if (isAdmin || !passToken) {
+        // If explicitly admin, show the admin login screen
+        if (isAdmin) {
+            document.documentElement.classList.remove('no-scroll');
+            document.body.classList.remove('no-scroll');
             if (landingOverlay) landingOverlay.classList.add('hidden');
             if (adminOverlay) adminOverlay.classList.remove('hidden');
             initAdminLogic();
+            return;
+        }
+
+        // If no token is provided, load in preview/test mode
+        if (!passToken) {
+            const previewData = { name: "Invitado de Prueba", passes: 3 };
+            setupGuestInvitation(previewData);
             return;
         }
 
@@ -797,8 +805,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setupGuestInvitation(guestData);
     };
 
-    // Run access control check immediately
-    checkInvitationAccess();
 
     // --- Initialize Vanilla Tilt (desktop only — no value on touch devices) ---
     const isTouchDevice = () => window.matchMedia('(hover: none)').matches;
@@ -868,44 +874,112 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Envelope opening interaction & Site Reveal Transition
     let transitionTriggered = false;
-    const triggerMainReveal = () => {
+    const triggerMainReveal = (instant = false) => {
         if (transitionTriggered) return;
         transitionTriggered = true;
 
-        // Confetti explosion
-        if (typeof confetti === 'function') {
-            confetti({
-                particleCount: 200,
-                spread: 90,
-                origin: { y: 0.6 },
-                colors: ['#d4af37', '#ffffff', '#c40000', '#000000']
-            });
-        }
+        document.documentElement.classList.remove('no-scroll');
+        document.body.classList.remove('no-scroll');
 
         if (typeof gsap !== 'undefined') {
-            const tl = gsap.timeline();
+            mainContent.style.display = 'block';
             mainContent.classList.remove('hidden');
+            if (instant) {
+                if (landingOverlay) landingOverlay.style.display = "none";
+            } else {
+                // Confetti explosion
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 200,
+                        spread: 90,
+                        origin: { y: 0.6 },
+                        colors: ['#d4af37', '#ffffff', '#c40000', '#000000']
+                    });
+                }
 
-            // Fast snappy fade out / zoom out transition
-            tl.to(".envelope-wrapper", { duration: 0.2, scale: 0.95, opacity: 0, ease: "power2.in" })
-                .to([".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], { duration: 0.2, opacity: 0, ease: "power2.in" }, "-=0.2")
-                .to(landingOverlay, { duration: 0.35, opacity: 0, ease: "power2.out" }, "-=0.15")
-                .set(landingOverlay, { display: "none" })
-                .from(".hero-v3 .hero-text > *", { duration: 0.4, y: 15, opacity: 0, stagger: 0.05, ease: "power2.out" }, "-=0.25")
-                .from(".hero-frame", { duration: 0.5, scale: 0.98, opacity: 0, ease: "power2.out" }, "-=0.35")
-                .from(".floating-asset", { duration: 0.6, scale: 0.5, opacity: 0, stagger: 0.05, ease: "back.out(1.2)" }, "-=0.45");
+                const startTypewriterAnimations = () => {
+                    const yearsEl = document.getElementById('typewriter-years');
+                    const infoEl = document.getElementById('typewriter-info');
+                    if (!yearsEl || !infoEl) return;
+
+                    const yearsText = "MIS 15 AÑOS";
+                    const infoText = "♠ 15 AGO 2026  •  8:30 PM  •  CASUAL ♠";
+
+                    yearsEl.innerHTML = '';
+                    infoEl.innerHTML = '';
+                    
+                    yearsEl.style.borderRight = "2px solid var(--gold)";
+                    yearsEl.style.display = "inline-block";
+                    yearsEl.style.width = "auto";
+                    yearsEl.style.paddingRight = "4px";
+
+                    let i = 0;
+                    function typeYears() {
+                        if (i < yearsText.length) {
+                            yearsEl.innerHTML += yearsText.charAt(i);
+                            i++;
+                            setTimeout(typeYears, 90);
+                        } else {
+                            yearsEl.style.borderRight = "none";
+                            yearsEl.style.display = "block";
+                            yearsEl.style.width = "100%";
+                            
+                            infoEl.style.borderRight = "2px solid var(--gold)";
+                            infoEl.style.display = "inline-block";
+                            infoEl.style.width = "auto";
+                            infoEl.style.paddingRight = "4px";
+                            
+                            let j = 0;
+                            function typeInfo() {
+                                if (j < infoText.length) {
+                                    infoEl.innerHTML += infoText.charAt(j);
+                                    j++;
+                                    setTimeout(typeInfo, 50);
+                                } else {
+                                    infoEl.style.borderRight = "none";
+                                    infoEl.style.display = "flex";
+                                    infoEl.style.width = "100%";
+                                }
+                            }
+                            typeInfo();
+                        }
+                    }
+                    typeYears();
+                };
+
+                const tl = gsap.timeline({
+                    onComplete: () => {
+                        // Force visibility in case GSAP animation gets stuck
+                        document.querySelectorAll('.hero-frame, .floating-asset, .floating-card, .hero-text > *').forEach(el => {
+                            el.style.opacity = '1';
+                            el.style.transform = 'none';
+                        });
+                        startTypewriterAnimations();
+                    }
+                });
+                // Fast snappy fade out / zoom out transition
+                tl.to(".envelope-wrapper", { duration: 0.12, scale: 0.95, opacity: 0, ease: "power2.in" })
+                    .to([".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], { duration: 0.12, opacity: 0, ease: "power2.in" }, "-=0.12")
+                    .to(landingOverlay, { duration: 0.2, opacity: 0, ease: "power2.out" }, "-=0.08")
+                    .set(landingOverlay, { display: "none" })
+                    .from(".hero-text > *", { duration: 0.25, y: 10, opacity: 0, stagger: 0.03, ease: "power2.out" }, "-=0.12")
+                    .from(".hero-frame", { duration: 0.25, scale: 0.99, opacity: 0, ease: "power2.out" }, "-=0.2")
+                    .from([".floating-asset", ".floating-card"], { duration: 0.35, scale: 0.7, opacity: 0, stagger: 0.03, ease: "back.out(1.1)" }, "-=0.22");
+            }
         } else {
+            mainContent.style.display = 'block';
             mainContent.classList.remove('hidden');
-            landingOverlay.style.display = "none";
+            if (landingOverlay) landingOverlay.style.display = "none";
         }
 
         initCountdown();
-
-
     };
 
     if (envelope) {
         envelope.addEventListener('click', (e) => {
+            if (envelope.classList.contains('processing') || transitionTriggered) return;
+            envelope.classList.add('processing');
+
             if (document.querySelector('.envelope-instruction')) {
                 document.querySelector('.envelope-instruction').style.opacity = '0';
             }
@@ -918,8 +992,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 musicControl.classList.remove('hidden');
             }
 
-            // Auto-transition to show the content instantly without opening animations
-            triggerMainReveal(); 
+            if (typeof gsap !== 'undefined') {
+                gsap.set(".envelope-flap", { transition: "none" });
+                gsap.set(".envelope-seal-container", { transition: "none" });
+
+                const openTl = gsap.timeline();
+ 
+                openTl
+                    .to(".envelope-seal-container", { duration: 0.1, scale: 0, opacity: 0, ease: "power2.in" })
+                    .to(".envelope-flap", {
+                        duration: 0.25,
+                        rotateX: 180,
+                        ease: "power2.inOut",
+                        onStart: () => {
+                            gsap.set(".envelope-flap", { zIndex: 1 });
+                        },
+                        onComplete: () => {
+                            triggerMainReveal();
+                        }
+                    }, 0);
+            } else {
+                triggerMainReveal();
+            }
         });
     }
 
@@ -1047,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Submit RSVP to Spreadsheet & trigger Telegram notification in background
             const selectedPassCount = guestSelect ? parseInt(guestSelect.value, 10) + 1 : 1;
-            
+
             // Save response in localStorage to remember on page reload
             const urlParams = new URLSearchParams(window.location.search);
             const passToken = urlParams.get('pass');
@@ -1191,4 +1285,135 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Lluvia de Oro (Gold Rain) via GSAP ---
+    function createFloatingParticles() {
+        const particleContainer = document.createElement('div');
+        particleContainer.id = "particle-container";
+        particleContainer.style.position = "fixed";
+        particleContainer.style.top = "0";
+        particleContainer.style.left = "0";
+        particleContainer.style.width = "100vw";
+        particleContainer.style.height = "100vh";
+        particleContainer.style.pointerEvents = "none";
+        particleContainer.style.zIndex = "9999";
+        particleContainer.style.overflow = "hidden";
+        document.body.appendChild(particleContainer);
+
+        const symbols = ['|', '✦', '·', '⋆'];
+        const colors = ['var(--gold)', 'var(--gold-bright)', '#ffdf00', '#d4af37'];
+        const numParticles = 120; // Dense rain
+
+        for (let i = 0; i < numParticles; i++) {
+            const particle = document.createElement('div');
+            
+            // Random properties
+            const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = Math.random() * 10 + 6; 
+            const left = Math.random() * 100; 
+            const duration = Math.random() * 4 + 2; 
+            const delay = Math.random() * 5; // Positive delay for GSAP start
+            const maxOpacity = Math.random() * 0.4 + 0.3; 
+            
+            particle.innerHTML = symbol;
+            particle.style.position = "absolute";
+            particle.style.color = color;
+            particle.style.fontSize = `${size}px`;
+            particle.style.left = `${left}vw`;
+            particle.style.top = "-10vh"; // Start above screen
+            particle.style.opacity = "0";
+            particle.style.userSelect = "none";
+            particle.style.pointerEvents = "none";
+            particle.style.fontFamily = "'Cinzel', serif";
+            particle.style.textShadow = "0 0 10px rgba(212, 175, 55, 0.4)";
+            
+            particleContainer.appendChild(particle);
+            
+            // GSAP Animation
+            if (typeof gsap !== 'undefined') {
+                gsap.to(particle, {
+                    y: "120vh",
+                    x: "+=5vw", // Slight wind effect
+                    rotation: 15,
+                    duration: duration,
+                    repeat: -1,
+                    delay: -delay, // Negative delay to start randomly in progress
+                    ease: "none",
+                    onStart: function() {
+                        // Fade in and out during the fall
+                        gsap.to(particle, { opacity: maxOpacity, duration: 0.3, ease: "power1.in" });
+                        gsap.to(particle, { opacity: 0, duration: 0.5, delay: duration - 0.5, ease: "power1.out" });
+                    },
+                    onRepeat: function() {
+                        gsap.set(particle, { opacity: 0 });
+                        gsap.to(particle, { opacity: maxOpacity, duration: 0.3, ease: "power1.in" });
+                        gsap.to(particle, { opacity: 0, duration: 0.5, delay: duration - 0.5, ease: "power1.out" });
+                    }
+                });
+            }
+        }
+    }
+
+    createFloatingParticles();
+
+    // --- Interactive Gold Cursor Trail ---
+    function initCursorTrail() {
+        // Only run on non-touch devices
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+
+        const cursorContainer = document.createElement('div');
+        cursorContainer.id = "cursor-trail-container";
+        cursorContainer.style.position = "fixed";
+        cursorContainer.style.top = "0";
+        cursorContainer.style.left = "0";
+        cursorContainer.style.width = "100vw";
+        cursorContainer.style.height = "100vh";
+        cursorContainer.style.pointerEvents = "none";
+        cursorContainer.style.zIndex = "9998";
+        document.body.appendChild(cursorContainer);
+
+        const colors = ['var(--gold)', 'var(--gold-bright)', '#ffffff'];
+        
+        document.addEventListener('mousemove', (e) => {
+            // Throttle particle creation slightly
+            if (Math.random() > 0.4) return;
+
+            const particle = document.createElement('div');
+            const size = Math.random() * 6 + 2; 
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.style.position = "absolute";
+            particle.style.left = `${e.clientX}px`;
+            particle.style.top = `${e.clientY}px`;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.backgroundColor = color;
+            particle.style.borderRadius = "50%";
+            particle.style.boxShadow = `0 0 ${size * 2}px ${color}`;
+            particle.style.pointerEvents = "none";
+            
+            cursorContainer.appendChild(particle);
+            
+            if (typeof gsap !== 'undefined') {
+                gsap.to(particle, {
+                    x: (Math.random() - 0.5) * 60,
+                    y: (Math.random() - 0.5) * 60 + 20,
+                    opacity: 0,
+                    scale: 0,
+                    duration: Math.random() * 0.5 + 0.6,
+                    ease: "power2.out",
+                    onComplete: () => {
+                        particle.remove();
+                    }
+                });
+            } else {
+                particle.remove();
+            }
+        });
+    }
+
+    initCursorTrail();
+
+    // Run access control check immediately after all functions are initialized
+    checkInvitationAccess();
 });
