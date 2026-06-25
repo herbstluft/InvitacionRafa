@@ -1413,6 +1413,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initCursorTrail();
 
+    // --- Manual Access Code Validation ---
+    const manualPassBtn = document.getElementById('manual-pass-btn');
+    const manualPassInput = document.getElementById('manual-pass-input');
+    
+    if (manualPassBtn && manualPassInput) {
+        const handleManualLogin = () => {
+            const val = manualPassInput.value.trim();
+            if (val) {
+                // Redirect to the same URL but with the pass token
+                window.location.href = window.location.pathname + "?pass=" + encodeURIComponent(val);
+            }
+        };
+        manualPassBtn.addEventListener('click', handleManualLogin);
+        manualPassInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleManualLogin();
+        });
+    }
+
     // Run access control check immediately after all functions are initialized
     checkInvitationAccess();
 });

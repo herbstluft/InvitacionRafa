@@ -280,14 +280,18 @@
                 para ingresar al Casino Royale.
             </p>
             <div class="glass-card-v3 felt-card"
-                style="padding: 2.5rem; border-color: rgba(176, 21, 37, 0.4) !important; background: radial-gradient(ellipse at center, #2e080b 0%, #150204 100%) !important; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.8);">
+                style="padding: 2.5rem; border-color: rgba(176, 21, 37, 0.4) !important; background: radial-gradient(ellipse at center, #2e080b 0%, #150204 100%) !important; max-width: 500px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center;">
                 <div class="symbol"
                     style="color: var(--crimson-light); font-size: 2.5rem; opacity: 0.8; margin-bottom: 0.8rem;">♠ ♥ ♣ ♦
                 </div>
                 <p
-                    style="font-size: 0.95rem; color: #ffb3b8; font-weight: 300; line-height: 1.6; letter-spacing: 0.5px;">
+                    style="font-size: 0.95rem; color: #ffb3b8; font-weight: 300; line-height: 1.6; letter-spacing: 0.5px; margin-bottom: 1.5rem; text-align: center;">
                     El ingreso a esta noche de casino está reservado exclusivamente para invitados con código digital
                     seguro.</p>
+                <div style="width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 0.8rem;">
+                    <input type="text" id="manual-pass-input" placeholder="INGRESA TU CÓDIGO VIP" class="admin-input" style="text-align: center; font-family: 'Cinzel', serif; letter-spacing: 2px;">
+                    <button id="manual-pass-btn" class="admin-btn-primary" style="background: linear-gradient(135deg, #b01525 0%, #5a0a12 100%); border-color: #ffb3b8; width: 100%;">VALIDAR ACCESO</button>
+                </div>
             </div>
         </div>
     </div>
@@ -888,7 +892,7 @@
     </div>
 
     <!-- App Script -->
-    <script src="script.js?v=32"></script>
+    <script src="script.js?v=33"></script>
 </body>
 
 </html>
