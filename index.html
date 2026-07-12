@@ -81,7 +81,19 @@
             <div class="envelope-container">
                 <div class="envelope">
                     <!-- Envelope flap -->
-                    <div class="envelope-flap"></div>
+                    <div class="envelope-flap">
+                        <svg class="envelope-flap-border" viewBox="0 0 550 190" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="gold-grad-envelope" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fff5bd" />
+                                    <stop offset="30%" stop-color="#e2bf46" />
+                                    <stop offset="70%" stop-color="#b88f1d" />
+                                    <stop offset="100%" stop-color="#e2bf46" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M 1.5,1.5 L 275,187 L 548.5,1.5" fill="none" stroke="url(#gold-grad-envelope)" stroke-width="2.5" />
+                        </svg>
+                    </div>
                     <!-- Wax seal button -->
                     <div class="envelope-seal-container">
                         <img src="assets/seal.webp" alt="Sello de Cera" class="envelope-seal">
@@ -257,7 +269,11 @@
                         </div>
                     </div>
                     <!-- Envelope pocket -->
-                    <div class="envelope-pocket"></div>
+                    <div class="envelope-pocket">
+                        <svg class="envelope-pocket-border" viewBox="0 0 550 380" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 1.5,1.5 L 275,187 L 548.5,1.5 M 1.5,1.5 L 1.5,378.5 L 548.5,378.5 L 548.5,1.5" fill="none" stroke="url(#gold-grad-envelope)" stroke-width="2.5" />
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>

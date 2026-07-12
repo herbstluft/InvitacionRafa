@@ -989,21 +989,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 gsap.set(".envelope-flap", { transition: "none" });
                 gsap.set(".envelope-seal-container", { transition: "none" });
 
-                const openTl = gsap.timeline();
+                const openTl = gsap.timeline({
+                    onComplete: () => {
+                        triggerMainReveal(true);
+                    }
+                });
  
                 openTl
-                    .to(".envelope-seal-container", { duration: 0.1, scale: 0, opacity: 0, ease: "power2.in" })
+                    .to(".envelope-seal-container", { duration: 0.25, scale: 0.6, opacity: 0, ease: "back.in(1.5)" })
                     .to(".envelope-flap", {
-                        duration: 0.25,
+                        duration: 0.45,
                         rotateX: 180,
                         ease: "power2.inOut",
                         onStart: () => {
                             gsap.set(".envelope-flap", { zIndex: 1 });
-                        },
-                        onComplete: () => {
-                            triggerMainReveal();
                         }
-                    }, 0);
+                    }, "-=0.1")
+                    .to(".envelope-paper", {
+                        duration: 0.85,
+                        y: "-65%",
+                        scale: 1.03,
+                        ease: "power3.out",
+                        onStart: () => {
+                            gsap.set(".envelope-paper", { zIndex: 12 });
+                        }
+                    }, "-=0.15")
+                    .to([".envelope-wrapper", ".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], {
+                        duration: 0.5,
+                        opacity: 0,
+                        ease: "power2.inOut"
+                    }, "+=0.3");
             } else {
                 triggerMainReveal();
             }

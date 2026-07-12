@@ -1337,11 +1337,19 @@ body::before {
     left: 0;
     width: 100%;
     height: 50%;
-    background: linear-gradient(to bottom, #151515, #080808);
+    background: linear-gradient(to bottom, #181818, #0a0a0a);
     clip-path: polygon(0 0, 100% 0, 50% 100%);
     z-index: 4;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
     transform-origin: top;
+}
+
+.envelope-flap-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
 .envelope-pocket {
@@ -1350,12 +1358,20 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #111 0%, #050505 100%);
+    background: linear-gradient(135deg, #141414 0%, #080808 100%);
     clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0, 50% 50%);
     z-index: 3;
     border-radius: 16px;
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
-    border-top: 1px solid rgba(212, 175, 55, 0.15);
+}
+
+.envelope-pocket-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
 .envelope-seal-container {
@@ -1366,15 +1382,31 @@ body::before {
     z-index: 5;
     cursor: pointer;
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.35);
+    animation: sealPulse 3s infinite ease-in-out;
+}
+
+@keyframes sealPulse {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+        transform: translate(-50%, -40%) scale(1);
+    }
+    50% {
+        box-shadow: 0 0 28px rgba(212, 175, 55, 0.85);
+        transform: translate(-50%, -40%) scale(1.04);
+    }
 }
 
 .envelope-seal-container:hover {
-    transform: translate(-50%, -40%) scale(1.15);
+    transform: translate(-50%, -40%) scale(1.15) !important;
+    animation-play-state: paused;
 }
 
 .envelope-seal {
     width: 90px;
     height: auto;
+    display: block;
 }
 
 .envelope-paper {
@@ -1394,6 +1426,7 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
+    transform: translateY(-8px);
 }
 
 .paper-content {
