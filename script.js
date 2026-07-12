@@ -1023,7 +1023,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             mainContent.style.display = 'block';
                             mainContent.classList.remove('hidden');
                         }
-                    }, "+=0.3")
+                    }, "+=3.5")
                     .to(landingOverlay, {
                         duration: 0.5,
                         opacity: 0,
