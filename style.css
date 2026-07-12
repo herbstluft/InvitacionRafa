@@ -1429,6 +1429,99 @@ body::before {
     transform: translateY(-8px);
 }
 
+/* --- Envelope Card Playing Cards Fan --- */
+.cards-fan-container {
+    position: relative;
+    width: 200px;
+    height: 100px;
+    margin: 0 auto 0.8rem;
+    display: flex;
+    justify-content: center;
+}
+
+.fan-card {
+    position: absolute;
+    width: 55px;
+    height: 80px;
+    background: #ffffff;
+    background: radial-gradient(circle at center, #ffffff 0%, #f0f0f0 100%);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    color: #050505;
+    font-family: 'Cinzel', serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px;
+    transform-origin: bottom center;
+}
+
+.fan-card.card-1 {
+    transform: rotate(-22deg) translateX(-35px) translateY(8px);
+    color: var(--red);
+}
+
+.fan-card.card-2 {
+    transform: rotate(-7deg) translateX(-12px) translateY(2px);
+}
+
+.fan-card.card-3 {
+    transform: rotate(8deg) translateX(12px) translateY(2px);
+    color: var(--red);
+}
+
+.fan-card.card-4 {
+    transform: rotate(23deg) translateX(35px) translateY(8px);
+}
+
+.card-corner-top,
+.card-corner-bottom {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.6rem;
+    font-weight: 900;
+    line-height: 1.1;
+    text-align: left;
+}
+
+.card-corner-bottom {
+    transform: rotate(180deg);
+}
+
+.card-suit-center {
+    font-size: 1.4rem;
+    text-align: center;
+    align-self: center;
+    line-height: 1;
+    margin-top: -2px;
+}
+
+/* --- Envelope Card Dice --- */
+.dice-container {
+    width: 110px;
+    height: auto;
+    margin: 0 auto 0.5rem;
+}
+
+.dice-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* --- Envelope Card Quote --- */
+.card-quote {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: #ddd;
+    max-width: 85%;
+    margin: 0.4rem auto 0.8rem;
+    line-height: 1.4;
+    text-align: center;
+    opacity: 0.9;
+}
+
 .paper-content {
     display: flex;
     flex-direction: column;
@@ -3397,6 +3490,45 @@ footer {
     .rsvp-title-text {
         font-size: 1.45rem !important;
         letter-spacing: 2px !important;
+    }
+
+    /* ---- Mobile Envelope Card Content Scaling ---- */
+    .envelope-paper {
+        padding: 0.8rem 0.6rem !important;
+    }
+
+    .envelope-paper .dice-container {
+        display: none !important;
+    }
+
+    .envelope-paper .card-quote {
+        display: none !important;
+    }
+
+    .envelope-paper .bottom-cards-fan {
+        display: none !important;
+    }
+
+    .envelope-paper .cards-fan-container {
+        transform: scale(0.68) translateY(-10px) !important;
+        margin-bottom: -25px !important;
+        height: 75px !important;
+        width: 150px !important;
+    }
+
+    .envelope-paper img {
+        width: 60px !important;
+        height: 60px !important;
+        margin: 0.1rem 0 !important;
+    }
+
+    .envelope-paper .card-rafa-title {
+        font-size: 1.8rem !important;
+        margin-top: 0 !important;
+    }
+
+    .envelope-paper .side-ornament {
+        display: none !important;
     }
 
     /* ---- Bypasses rendering offscreen elements to save CPU/GPU ---- */
