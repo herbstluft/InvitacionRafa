@@ -1297,6 +1297,16 @@ body::before {
     margin-bottom: 2.5rem;
     line-height: 1.6;
     text-transform: uppercase;
+    animation: textFloat 3.5s ease-in-out infinite;
+}
+
+@keyframes textFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .envelope-instruction span {
@@ -1376,15 +1386,7 @@ body::before {
 
 .envelope-flap-border path,
 .envelope-pocket-border path {
-    stroke-dasharray: 1200;
-    stroke-dashoffset: 1200;
-    animation: drawGoldBorder 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-}
-
-@keyframes drawGoldBorder {
-    to {
-        stroke-dashoffset: 0;
-    }
+    filter: drop-shadow(0 0 3px var(--gold)) drop-shadow(0 0 7px rgba(212, 175, 55, 0.7));
 }
 
 .envelope-seal-container {
@@ -1433,7 +1435,7 @@ body::before {
     border-radius: 12px;
     z-index: 2;
     padding: 2rem 1.5rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.6);
     transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
     overflow: hidden;
     display: flex;
@@ -1533,6 +1535,20 @@ body::before {
     line-height: 1.4;
     text-align: center;
     opacity: 0.9;
+}
+
+.wave-letter {
+    display: inline-block;
+    animation: letterWave 2.4s ease-in-out infinite;
+}
+
+@keyframes letterWave {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
 .paper-content {

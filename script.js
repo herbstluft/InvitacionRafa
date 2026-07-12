@@ -863,6 +863,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainContent = document.getElementById('main-content');
     const musicControl = document.getElementById('music-control');
     const musicIcon = document.getElementById('music-icon');
+
+    // --- Wave animation splitter for card quote ---
+    const quoteEl = document.querySelector('.card-quote');
+    if (quoteEl) {
+        const text = quoteEl.innerText;
+        quoteEl.innerHTML = '';
+        text.split('').forEach((char, index) => {
+            const span = document.createElement('span');
+            span.className = 'wave-letter';
+            span.style.animationDelay = `${index * 0.04}s`;
+            if (char === ' ') {
+                span.innerHTML = '&nbsp;';
+            } else {
+                span.innerText = char;
+            }
+            quoteEl.appendChild(span);
+        });
+    }
     const audio = document.getElementById('bg-music');
 
     // Envelope opening interaction & Site Reveal Transition
