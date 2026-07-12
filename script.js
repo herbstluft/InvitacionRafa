@@ -880,15 +880,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (instant) {
                 if (landingOverlay) landingOverlay.style.display = "none";
             } else {
-                // Confetti explosion
-                if (typeof confetti === 'function') {
-                    confetti({
-                        particleCount: 200,
-                        spread: 90,
-                        origin: { y: 0.6 },
-                        colors: ['#d4af37', '#ffffff', '#c40000', '#000000']
-                    });
-                }
 
                 const startTypewriterAnimations = () => {
                     const yearsEl = document.getElementById('typewriter-years');
