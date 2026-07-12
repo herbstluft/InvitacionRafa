@@ -3314,10 +3314,82 @@ footer {
    PERFORMANCE — MOBILE & REDUCED MOTION
    ============================================= */
 
-/* On mobile devices, kill expensive GPU animations to prevent lag */
+/* On mobile devices, kill ALL expensive GPU animations to prevent lag */
 @media (max-width: 768px) {
 
-    /* Stop floating animations on mobile chips (huge FPS gain) */
+    /* ---- Bypasses rendering offscreen elements to save CPU/GPU ---- */
+    .section {
+        content-visibility: auto;
+        contain-intrinsic-size: 1px 500px;
+    }
+
+    /* ---- KILL backdrop-filter (biggest FPS killer on mobile) ---- */
+    .glass-card-v3,
+    .rsvp-card-v3,
+    .vip-pass-ticket,
+    .admin-card,
+    .admin-modal-box {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    /* ---- KILL the complex repeating body gradient (repaints every frame) ---- */
+    body::before {
+        background: radial-gradient(circle at 50% 50%, #0d0d0d 0%, #050505 100%) !important;
+        background-size: 100% 100% !important;
+    }
+
+    /* ---- KILL the casino spotlight (covers full viewport width, huge paint area) ---- */
+    .casino-spotlight {
+        display: none !important;
+    }
+
+    /* ---- KILL sparkles overlay (large fixed PNG, repaints) ---- */
+    .sparkles-overlay {
+        display: none !important;
+    }
+
+    /* ---- KILL shimmer on name (background-size 300% causes repaint on every frame) ---- */
+    .rafa-name,
+    .rafa-title,
+    .card-rafa-title {
+        animation: none !important;
+        background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-dark) 100%) !important;
+        background-size: 100% auto !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+    }
+
+    /* ---- KILL neonPulse on section titles (text-shadow repaint every frame) ---- */
+    .section-neon,
+    .footer-title {
+        animation: none !important;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5) !important;
+    }
+
+    /* ---- KILL nameGlow + welcomeGlow + textSoftFloat (all trigger compositing) ---- */
+    .welcome-text {
+        animation: none !important;
+        text-shadow: 0 0 8px rgba(212, 175, 55, 0.4) !important;
+    }
+
+    .hero-years {
+        animation: none !important;
+    }
+
+    /* ---- KILL floating card drift animation ---- */
+    .floating-card {
+        animation: none !important;
+        transform: rotate(var(--card-rot, 0deg)) !important;
+    }
+
+    /* ---- KILL suit watermarks (animated + large font-size) ---- */
+    .suit-watermark {
+        display: none !important;
+    }
+
+    /* ---- KILL chip float animations ---- */
     .chip-1,
     .chip-2,
     .side-chip.left-chip-1,
@@ -3327,30 +3399,66 @@ footer {
         animation: none !important;
     }
 
+    /* ---- KILL roulette rotation ---- */
+    .roulette-hero,
+    .landing-roulette-bg {
+        animation: none !important;
+        opacity: 0.04 !important;
+    }
 
+    /* ---- KILL hero-info-item glow box-shadow animation ---- */
+    .hero-info-item {
+        animation: none !important;
+        box-shadow: 0 0 8px rgba(212, 175, 55, 0.2) !important;
+    }
 
-    /* Hide decorative suit watermarks on mobile for cleaner experience */
-    .suit-watermark {
+    /* ---- Simplify drop-shadow filters (they trigger GPU compositing) ---- */
+    .floating-asset,
+    .gift-icon-v3,
+    .dress-icon,
+    .t-icon,
+    .timeline-dot {
+        filter: none !important;
+    }
+
+    /* ---- Simplify glass card mouse-glow pseudo-element ---- */
+    .glass-card-v3::before {
         display: none !important;
     }
 
-    /* Slow down the spotlight sweep — it paints a large area every frame */
-    .section-spotlight {
-        animation-duration: 24s !important;
+    /* ---- Disable floating-music icon rotation filter ---- */
+    .floating-music img {
+        filter: none !important;
     }
 
-    /* Reduce borderGlow repaint rate */
-    .hero-info-item {
-        animation: none !important;
-        box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+    /* ---- Reduce gallery overlay glow ---- */
+    .gallery-overlay-glow {
+        display: none !important;
     }
 
-    /* Stop roulette rotation to free GPU */
-    .roulette-hero {
-        animation: none !important;
-        opacity: 0.15 !important;
+    /* ---- Simplify transition durations so interactions feel instant ---- */
+    .gold-btn-v3,
+    .dress-card,
+    .glass-card-v3,
+    .gallery-card,
+    .admin-btn-primary {
+        transition: transform 0.15s ease, opacity 0.15s ease !important;
+    }
+
+    /* ---- Stop casino particle animations ---- */
+    .casino-particle {
+        display: none !important;
+    }
+
+    /* ---- will-change only on things that truly animate on mobile ---- */
+    .envelope-wrapper,
+    .envelope-seal,
+    .hero-frame,
+    .main-portrait {
+        will-change: auto !important;
     }
 }
+
 
 /* Respect user accessibility setting (reduce motion in OS) */
 @media (prefers-reduced-motion: reduce) {

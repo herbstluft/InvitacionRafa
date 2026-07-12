@@ -837,8 +837,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- GSAP Landing Intro Animation ---
-    if (typeof gsap !== 'undefined') {
+    // --- GSAP Landing Intro Animation (desktop only, skip on touch/mobile for performance) ---
+    if (typeof gsap !== 'undefined' && !isTouchDevice()) {
         const introTl = gsap.timeline();
         introTl.set(".landing-frame", { scale: 1.02, opacity: 0 })
             .set(".landing-roulette-bg", { scale: 0.8, opacity: 0 })
@@ -879,15 +879,26 @@ document.addEventListener('DOMContentLoaded', () => {
             mainContent.classList.remove('hidden');
             if (instant) {
                 if (landingOverlay) landingOverlay.style.display = "none";
+            } else if (isTouchDevice()) {
+                // Mobile: skip all GSAP transitions — instant reveal, zero lag
+                if (landingOverlay) landingOverlay.style.display = "none";
+                document.querySelectorAll('.hero-frame, .floating-asset, .floating-card, .hero-text > *').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                });
+                const yearsElM = document.getElementById('typewriter-years');
+                const infoElM = document.getElementById('typewriter-info');
+                if (yearsElM) { yearsElM.innerHTML = "MIS XV A\u00d1OS"; yearsElM.style.borderRight = "none"; yearsElM.style.display = "block"; }
+                if (infoElM) { infoElM.innerHTML = "\u2660 15 AGO 2026 \u2022 8:30 PM \u2022 CASUAL \u2660"; infoElM.style.borderRight = "none"; infoElM.style.display = "flex"; }
             } else {
-
+                // Desktop: full GSAP transition
                 const startTypewriterAnimations = () => {
                     const yearsEl = document.getElementById('typewriter-years');
                     const infoEl = document.getElementById('typewriter-info');
                     if (!yearsEl || !infoEl) return;
 
-                    const yearsText = "MIS 15 AÑOS";
-                    const infoText = "♠ 15 AGO 2026  •  8:30 PM  •  CASUAL ♠";
+                    const yearsText = "MIS XV A\u00d1OS";
+                    const infoText = "\u2660 15 AGO 2026  \u2022  8:30 PM  \u2022  CASUAL \u2660";
 
                     yearsEl.innerHTML = '';
                     infoEl.innerHTML = '';
@@ -933,7 +944,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const tl = gsap.timeline({
                     onComplete: () => {
-                        // Force visibility in case GSAP animation gets stuck
                         document.querySelectorAll('.hero-frame, .floating-asset, .floating-card, .hero-text > *').forEach(el => {
                             el.style.opacity = '1';
                             el.style.transform = 'none';
@@ -941,7 +951,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         startTypewriterAnimations();
                     }
                 });
-                // Fast snappy fade out / zoom out transition
                 tl.to(".envelope-wrapper", { duration: 0.12, scale: 0.95, opacity: 0, ease: "power2.in" })
                     .to([".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], { duration: 0.12, opacity: 0, ease: "power2.in" }, "-=0.12")
                     .to(landingOverlay, { duration: 0.2, opacity: 0, ease: "power2.out" }, "-=0.08")
@@ -1064,26 +1073,34 @@ document.addEventListener('DOMContentLoaded', () => {
         setInterval(updateTimer, 1000);
     }
 
-    // --- GSAP ScrollTrigger reveals (Optimized for instant, supersonic reveal) ---
+    // --- GSAP ScrollTrigger reveals (Instant on mobile, animated on desktop) ---
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
 
-        gsap.set(".reveal", { y: 15, opacity: 0 });
-
-        const reveals = gsap.utils.toArray('.reveal');
-        reveals.forEach(el => {
-            gsap.to(el, {
-                scrollTrigger: {
-                    trigger: el,
-                    start: "top 95%",
-                    toggleActions: "play none none reverse"
-                },
-                y: 0,
-                opacity: 1,
-                duration: 0.45,
-                ease: "power2.out"
+        if (isTouchDevice()) {
+            // Mobile: make all reveal elements visible immediately — no scroll animation lag
+            document.querySelectorAll('.reveal').forEach(el => {
+                el.style.opacity = '1';
+                el.style.transform = 'none';
             });
-        });
+        } else {
+            gsap.set(".reveal", { y: 15, opacity: 0 });
+
+            const reveals = gsap.utils.toArray('.reveal');
+            reveals.forEach(el => {
+                gsap.to(el, {
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 95%",
+                        toggleActions: "play none none reverse"
+                    },
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.45,
+                    ease: "power2.out"
+                });
+            });
+        }
     }
 
     // --- Copy CLABE Code with Tooltip ---
