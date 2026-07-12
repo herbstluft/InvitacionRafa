@@ -1017,8 +1017,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     .to([".envelope-wrapper", ".side-chip", ".landing-roulette-bg", ".landing-frame", ".corner-decor"], {
                         duration: 0.5,
                         opacity: 0,
+                        ease: "power2.inOut",
+                        onStart: () => {
+                            // Display the main content underneath before the overlay fades out!
+                            mainContent.style.display = 'block';
+                            mainContent.classList.remove('hidden');
+                        }
+                    }, "+=0.3")
+                    .to(landingOverlay, {
+                        duration: 0.5,
+                        opacity: 0,
                         ease: "power2.inOut"
-                    }, "+=0.3");
+                    }, "-=0.5");
             } else {
                 triggerMainReveal();
             }
