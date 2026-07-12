@@ -871,6 +871,35 @@ document.addEventListener('DOMContentLoaded', () => {
         if (transitionTriggered) return;
         transitionTriggered = true;
 
+        // Trigger cinematic sequential gold confetti explosion on reveal
+        if (typeof confetti !== 'undefined') {
+            // Cannon 1: Central main burst
+            confetti({
+                particleCount: 100,
+                spread: 80,
+                origin: { y: 0.55 },
+                colors: ['#fffbe0', '#f9e272', '#d4af37', '#996515']
+            });
+
+            // Cannons 2 & 3: Side cannons firing inward 250ms later for layered cascade
+            setTimeout(() => {
+                confetti({
+                    particleCount: 90,
+                    angle: 60,
+                    spread: 65,
+                    origin: { x: 0, y: 0.85 },
+                    colors: ['#fffbe0', '#f9e272', '#d4af37', '#996515']
+                });
+                confetti({
+                    particleCount: 90,
+                    angle: 120,
+                    spread: 65,
+                    origin: { x: 1, y: 0.85 },
+                    colors: ['#fffbe0', '#f9e272', '#d4af37', '#996515']
+                });
+            }, 250);
+        }
+
         document.documentElement.classList.remove('no-scroll');
         document.body.classList.remove('no-scroll');
 
@@ -977,6 +1006,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelector('.envelope-instruction').style.opacity = '0';
             }
 
+
+
             // Auto start audio music on envelope break
             if (audio && musicIcon && musicControl) {
                 audio.play().then(() => {
@@ -1023,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             mainContent.style.display = 'block';
                             mainContent.classList.remove('hidden');
                         }
-                    }, "+=3.5")
+                    }, "+=6.5")
                     .to(landingOverlay, {
                         duration: 0.5,
                         opacity: 0,
@@ -1380,7 +1411,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    createFloatingParticles();
+    // createFloatingParticles();
 
     // --- Interactive Gold Cursor Trail ---
     function initCursorTrail() {
